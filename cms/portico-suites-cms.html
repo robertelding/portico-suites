@@ -199,6 +199,7 @@ const DEFAULT_CONTENT = {
     {id:'booking', name:'Secure Checkout', visible:true},
     {id:'reviews', name:'Guest Reviews', visible:true},
     {id:'blog', name:'Blog / Journal', visible:true},
+    {id:'keyfacts', name:'Key Facts (AI Answers)', visible:true},
     {id:'newsletter', name:'Newsletter Signup', visible:true},
     {id:'policies', name:'Policies', visible:true}
   ],
@@ -342,6 +343,10 @@ function normalizeContent(){
     content.layout.splice(polIdx(), 0, {id:'blog', name:'Blog / Journal', visible:true});
   if(!content.layout.find(s=>s.id==='newsletter'))
     content.layout.splice(polIdx(), 0, {id:'newsletter', name:'Newsletter Signup', visible:true});
+  if(!content.layout.find(s=>s.id==='keyfacts')){
+    const bi = content.layout.findIndex(s=>s.id==='blog');
+    content.layout.splice(bi < 0 ? polIdx() : bi + 1, 0, {id:'keyfacts', name:'Key Facts (AI Answers)', visible:true});
+  }
 }
 
 let content = JSON.parse(JSON.stringify(DEFAULT_CONTENT));
@@ -1522,16 +1527,14 @@ function buildSite(c){
 </div></section>`
   };
 
-  /* AI answer block — extraction-friendly key facts after the hero */
+  /* AI answer block — extraction-friendly key facts, position set in Layout tab */
   const seo = c.seo || {};
-  if(seo.answerBlock && (seo.facts||[]).length && sections.hero){
-    sections.hero += `
-<section class="facts" id="key-facts" style="padding:64px 0 0"><div class="wrap">
+  sections.keyfacts = (seo.answerBlock && (seo.facts||[]).length) ? `
+<section class="facts" id="key-facts" style="padding:80px 0"><div class="wrap">
   <div class="section-head"><div class="eyebrow">Key Facts</div>
   <h2 style="font-size:22px">${esc(B.name)} — ${esc(B.sublabel)}: Quick Answers</h2><div class="rule center"></div></div>
   <dl class="facts-list">${seo.facts.map(f=>`<div class="fact"><dt>${esc(f.q)}</dt><dd>${esc(f.a)}</dd></div>`).join('')}</dl>
-</div></section>`;
-  }
+</div></section>` : '';
 
   /* SEO head: meta, OG, canonical, JSON-LD */
   const siteUrl = (seo.siteUrl||'').replace(/\/$/,'');
