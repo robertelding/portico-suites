@@ -199,7 +199,7 @@ const DEFAULT_CONTENT = {
     {id:'booking', name:'Secure Checkout', visible:true},
     {id:'reviews', name:'Guest Reviews', visible:true},
     {id:'blog', name:'Blog / Journal', visible:true},
-    {id:'keyfacts', name:'Key Facts (AI Answers)', visible:true},
+    {id:'keyfacts', name:'Key Facts & FAQ', visible:true},
     {id:'newsletter', name:'Newsletter Signup', visible:true},
     {id:'policies', name:'Policies', visible:true}
   ],
@@ -316,6 +316,26 @@ const DEFAULT_CONTENT = {
     tasks:{}, lastUpdated:''
   },
   custom:{},
+  faq:{
+    heading:'Key Facts & FAQ',
+    intro:'Quick answers about the suites, booking and staying in Harrogate.',
+    categories:[
+      {name:'Essentials', items:[
+        {q:'Where is Portico Suites?', a:'Portico Suites is on Franklin Road in central Harrogate, North Yorkshire (postcode HG1 5EN), a short walk from the town centre and Harrogate rail station.'},
+        {q:'How many guests can stay?', a:'The house sleeps up to 6 guests across 3 bedrooms with 2 bathrooms.'},
+        {q:'What are check-in and check-out times?', a:'Check-in from 3:00 PM with self check-in via smart lock; check-out by 10:00 AM. Early check-in from 1:00 PM can be added during booking.'}
+      ]},
+      {name:'Booking & Payment', items:[
+        {q:'How do I get the best rate?', a:'Book direct on this website — direct bookings carry no platform fees and beat Airbnb and Vrbo pricing for the same dates.'},
+        {q:'Is booking instant?', a:'Yes. Payment is processed securely by Stripe or PayPal and confirmation is emailed instantly.'},
+        {q:'Is there a deposit?', a:'A pre-arrival guest verification and a refundable security deposit hold are completed 72 hours before check-in.'}
+      ]},
+      {name:'The Local Area', items:[
+        {q:'How far is the town centre?', a:'Harrogate town centre, Bettys and the Valley Gardens are all within a short walk of Franklin Road.'},
+        {q:'Is parking available?', a:'Parking options are available nearby; a reserved space can be added during booking where offered.'}
+      ]}
+    ]
+  },
   fbads:{
     objective:'OUTCOME_TRAFFIC', dailyBudget:20, durationDays:14,
     adAccountId:'', pageId:'', pixelId:'', apiBase:'', adminKey:'',
@@ -345,7 +365,17 @@ function normalizeContent(){
     content.layout.splice(polIdx(), 0, {id:'newsletter', name:'Newsletter Signup', visible:true});
   if(!content.layout.find(s=>s.id==='keyfacts')){
     const bi = content.layout.findIndex(s=>s.id==='blog');
-    content.layout.splice(bi < 0 ? polIdx() : bi + 1, 0, {id:'keyfacts', name:'Key Facts (AI Answers)', visible:true});
+    content.layout.splice(bi < 0 ? polIdx() : bi + 1, 0, {id:'keyfacts', name:'Key Facts & FAQ', visible:true});
+  }
+  const kfRow = content.layout.find(s=>s.id==='keyfacts');
+  if(kfRow) kfRow.name = 'Key Facts & FAQ';
+  if(!content.faq){
+    const old = (content.seo && content.seo.facts && content.seo.facts.length)
+      ? [{name:'Essentials', items: content.seo.facts}]
+      : JSON.parse(JSON.stringify(D.faq.categories));
+    content.faq = { heading:'Key Facts & FAQ',
+      intro:'Quick answers about the suites, booking and staying in Harrogate.',
+      categories: old };
   }
 }
 
@@ -397,6 +427,7 @@ const TABS = [
   {id:'emailTpl', name:'Email Templates'},
   {id:'fbads', name:'Facebook Ads'},
   {id:'blog', name:'Blog / Journal'},
+  {id:'faqTab', name:'FAQ / Key Facts'},
   {id:'seo', name:'SEO & AI Search'},
   {group:'Content'},
   {id:'hero', name:'Hero & Search'},
@@ -656,6 +687,29 @@ function renderEditor(){
         + `<div class="hint" style="margin-top:14px">Contact details are managed under <strong>Branding & Logo</strong>.</div>`;
       break;
 
+    case 'faqTab': {
+      const cats = content.faq.categories;
+      const total = cats.reduce((n,c)=> n + c.items.length, 0);
+      html = `<h2>FAQ / Key Facts</h2>
+        <div class="hint">${total} answers in ${cats.length} categories — shown as tabs in the "Key Facts & FAQ" section (position set in Layout, visibility switch in SEO tab). Every answer also feeds FAQ schema for Google & AI search. Add as many as you like — short, definitive answers work best.</div>
+        ${textField('Section heading','faq.heading')}
+        ${areaField('Intro line','faq.intro')}
+        ${cats.map((cat,c)=>`
+          <div class="list-item" style="border-left:3px solid var(--olive)">
+            <div class="li-head"><span class="li-title">📁 ${esc(cat.name)}</span>${listControls('faq.categories',c,cats.length)}</div>
+            ${textField('Category name (tab label)',`faq.categories.${c}.name`)}
+            ${cat.items.map((it,i)=>`
+              <div class="list-item" style="margin:10px 0 10px 12px">
+                <div class="li-head"><span class="li-title">Q${i+1}</span>${listControls(`faq.categories.${c}.items`,i,cat.items.length)}</div>
+                ${textField('Question',`faq.categories.${c}.items.${i}.q`)}
+                ${areaField('Answer (short & definitive)',`faq.categories.${c}.items.${i}.a`)}
+              </div>`).join('')}
+            <button class="add-btn" onclick='addItem("faq.categories.${c}.items", JSON.stringify({q:"New question?", a:""}))'>+ Add Q&A to ${esc(cat.name)}</button>
+          </div>`).join('')}
+        <button class="add-btn" onclick='addItem("faq.categories", JSON.stringify({name:"New category", items:[{q:"New question?", a:""}]}))'>+ Add category</button>`;
+      break;
+    }
+
     case 'subscribers':
       html = `<h2>Email Subscribers</h2>
         <div class="hint">${subscribers.length} on the list — the <strong>full database view</strong> (search, sort, remove) is shown in the preview pane →. Manage the list here.</div>
@@ -787,14 +841,9 @@ function renderEditor(){
         <button class="mini-btn" onclick="genMetaDescription()">✨ Auto-generate description from content</button>
         <div style="height:14px"></div>
         ${imageField('Social share image (OG)','seo.ogImage','Ideal size 1200×630 — shown when the site is shared on social or in chats.')}
-        <div class="field"><label>AI answer block ("Key Facts")</label>
+        <div class="field"><label>AI answer block ("Key Facts & FAQ")</label>
           <label class="switch"><input type="checkbox" ${content.seo.answerBlock?'checked':''} onchange="set('seo.answerBlock', this.checked)"><span class="slider"></span></label>
-          <div class="sub">Adds a short, extraction-friendly Q&A block near the top of the page and matching FAQ schema — exactly what AI Overviews quote.</div></div>
-        ${content.seo.facts.map((fq,i)=>`
-          <div class="list-item"><div class="li-head"><span class="li-title">Q&A ${i+1}</span>${listControls('seo.facts',i,content.seo.facts.length)}</div>
-          ${textField('Question',`seo.facts.${i}.q`)}
-          ${areaField('Answer (short & definitive)',`seo.facts.${i}.a`)}</div>`).join('')}
-        <button class="add-btn" onclick='addItem("seo.facts", JSON.stringify({q:"New question?", a:""}))'>+ Add Q&A</button>
+          <div class="sub">Shows the FAQ section on the site and generates matching FAQ schema — exactly what AI Overviews quote. Questions and categories are managed in the <strong>FAQ / Key Facts</strong> tab.</div></div>
         <div class="field" style="margin-top:20px"><label>Technical files</label>
           <div class="img-btns" style="justify-content:flex-start">
             <button class="mini-btn" onclick="download('robots.txt', robotsTxt(), 'text/plain'); toast('robots.txt downloaded — upload to your site root')">⬇ robots.txt</button>
@@ -1304,7 +1353,8 @@ function seoHealthCheck(){
   const dl = (s.metaDescription||'').length;
   P(dl>=120 && dl<=160, dl>0, `Meta description length (${dl} chars)`, 'Aim for 120–160 characters answering "what, where, why book direct".');
   P(!!s.siteUrl && s.siteUrl.startsWith('https://'), false, 'Canonical site URL set', 'Set your live https:// domain so canonical tags and sitemaps are correct.');
-  P(s.answerBlock && s.facts.length >= 3, s.facts.length>0, `Answer block for AI extraction (${s.facts.length} Q&As)`, 'Keep 3–6 short, definitive Q&As — these feed the visible Key Facts block and FAQ schema.');
+  const nFaq = ((content.faq&&content.faq.categories)||[]).reduce((n,c)=>n+c.items.length,0);
+  P(s.answerBlock && nFaq >= 3, nFaq>0, `FAQ answers for AI extraction (${nFaq} Q&As)`, 'Keep answers short and definitive — every Q&A feeds the visible FAQ section and FAQ schema. Manage them in the FAQ / Key Facts tab.');
   P(true, false, 'Structured data (schema.org)', 'LodgingBusiness, FAQPage and BlogPosting JSON-LD are generated automatically on export.');
   P(!!s.ogImage, false, 'Social/OG share image', 'Upload a wide photo (1200×630) so links shared to social and chat look right.');
   const noCaption = content.gallery.images.filter(g=>!g.label?.trim()).length;
@@ -1527,13 +1577,24 @@ function buildSite(c){
 </div></section>`
   };
 
-  /* AI answer block — extraction-friendly key facts, position set in Layout tab */
+  /* Key Facts & FAQ — tabbed categories, all content in DOM for AI extraction */
   const seo = c.seo || {};
-  sections.keyfacts = (seo.answerBlock && (seo.facts||[]).length) ? `
+  const faqCats = ((c.faq && c.faq.categories) || []).filter(cat => cat.items && cat.items.length);
+  sections.keyfacts = (seo.answerBlock && faqCats.length) ? `
 <section class="facts" id="key-facts" style="padding:80px 0"><div class="wrap">
+  <style>
+    .faq-tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:26px 0 30px}
+    .faq-tab{font-family:inherit;letter-spacing:.14em;text-transform:uppercase;font-size:11px;padding:10px 20px;border:1px solid var(--stone,#CFC4AE);background:transparent;color:inherit;cursor:pointer;transition:all .25s}
+    .faq-tab.on{background:var(--olive,#34402F);color:#F3F0E8;border-color:var(--olive,#34402F)}
+    .faq-panel[hidden]{display:none}
+  </style>
   <div class="section-head"><div class="eyebrow">Key Facts</div>
-  <h2 style="font-size:22px">${esc(B.name)} — ${esc(B.sublabel)}: Quick Answers</h2><div class="rule center"></div></div>
-  <dl class="facts-list">${seo.facts.map(f=>`<div class="fact"><dt>${esc(f.q)}</dt><dd>${esc(f.a)}</dd></div>`).join('')}</dl>
+  <h2 style="font-size:26px">${esc((c.faq && c.faq.heading) || 'Key Facts & FAQ')}</h2><div class="rule center"></div>
+  ${c.faq && c.faq.intro ? `<p style="opacity:.8;max-width:560px;margin:14px auto 0;font-weight:300">${esc(c.faq.intro)}</p>` : ''}</div>
+  ${faqCats.length > 1 ? `<div class="faq-tabs" role="tablist">${faqCats.map((cat,i)=>`
+    <button class="faq-tab${i===0?' on':''}" role="tab" data-cat="${i}" onclick="document.querySelectorAll('#key-facts .faq-tab').forEach(b=>b.classList.toggle('on',b===this));document.querySelectorAll('#key-facts .faq-panel').forEach(p=>p.hidden = p.dataset.cat!==this.dataset.cat)">${esc(cat.name)}</button>`).join('')}</div>` : ''}
+  ${faqCats.map((cat,i)=>`
+  <dl class="facts-list faq-panel" data-cat="${i}" ${i>0?'hidden':''}>${cat.items.map(f=>`<div class="fact"><dt>${esc(f.q)}</dt><dd>${esc(f.a)}</dd></div>`).join('')}</dl>`).join('')}
 </div></section>` : '';
 
   /* SEO head: meta, OG, canonical, JSON-LD */
@@ -1546,9 +1607,10 @@ function buildSite(c){
     "amenityFeature": c.amenities.items.map(a=>({"@type":"LocationFeatureSpecification","name":a.title,"value":true})),
     "dateModified": seo.lastUpdated || undefined
   };
-  const faq = (seo.answerBlock && (seo.facts||[]).length) ? {
+  const allFaqItems = faqCats.flatMap(cat => cat.items);
+  const faq = (seo.answerBlock && allFaqItems.length) ? {
     "@context":"https://schema.org","@type":"FAQPage",
-    "mainEntity": seo.facts.map(f=>({"@type":"Question","name":f.q,"acceptedAnswer":{"@type":"Answer","text":f.a}}))
+    "mainEntity": allFaqItems.map(f=>({"@type":"Question","name":f.q,"acceptedAnswer":{"@type":"Answer","text":f.a}}))
   } : null;
   const blogLd = (c.blog?.posts||[]).filter(p=>p.published).map(p=>({
     "@context":"https://schema.org","@type":"BlogPosting","headline":p.title,
