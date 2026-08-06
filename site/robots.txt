@@ -1,0 +1,19 @@
+# Portico Suites — porticosuites.com
+# All welcome, including AI assistants & answer engines.
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-Web
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://porticosuites.com/sitemap.xml
