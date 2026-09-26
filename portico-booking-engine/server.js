@@ -20,10 +20,19 @@ const PROPERTY_ID = process.env.HOSPITABLE_PROPERTY_ID;
 const CURRENCY = process.env.CURRENCY || 'gbp';
 const DIRECT_SAVINGS_PCT = Number(process.env.DIRECT_SAVINGS_PCT || 12);
 
-/* ── CORS (booking widget origin only) ─────────────────────────────── */
+/* ── CORS — site origins (apex + www + configured + Pages previews) ── */
+const CORS_ALLOWED = new Set([
+  (process.env.SITE_ORIGIN || '').replace(/\/$/, ''),
+  'https://porticosuites.com',
+  'https://www.porticosuites.com'
+].filter(Boolean));
 app.use((req, res, next) => {
-  res.set('Access-Control-Allow-Origin', process.env.SITE_ORIGIN || '*');
-  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  const origin = req.headers.origin;
+  if (origin && (CORS_ALLOWED.has(origin) || /https:\/\/[a-z0-9-]+\.portico-suites(-[a-z0-9]+)?\.pages\.dev$/.test(origin) || origin.endsWith('.pages.dev')))
+    res.set('Access-Control-Allow-Origin', origin);
+  res.set('Vary', 'Origin');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, X-Admin-Key');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
