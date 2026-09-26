@@ -271,6 +271,8 @@ const DEFAULT_CONTENT = {
     intro:'Payments handled securely by Stripe or PayPal, with instant confirmation to your inbox.',
     currency:'£', nightlyRate:0, cleaningFee:0,
     apiBase:'https://booking.porticosuites.com', stripePk:'',
+    hospitableSiteUuid:'a2c4edd4-3b79-4270-a2e5-b2cd1475eea4',
+    hospitablePropertyId:'2466600', hospitableTheme:'multi',
     secureNote:'256-bit SSL · Powered by Stripe · Instant confirmation · No account required'
   },
   reviews:{
@@ -432,6 +434,11 @@ function normalizeContent(){
   const bkRow = content.layout.find(s=>s.id==='booking'); if(bkRow) bkRow.name = 'Booking & Availability';
   if(!content.guidePages) content.guidePages = JSON.parse(JSON.stringify(D.guidePages));
   if(content.booking && content.booking.apiBase === undefined){ content.booking.apiBase = D.booking.apiBase; content.booking.stripePk = ''; }
+  if(content.booking && content.booking.hospitableSiteUuid === undefined){
+    content.booking.hospitableSiteUuid = D.booking.hospitableSiteUuid;
+    content.booking.hospitablePropertyId = D.booking.hospitablePropertyId;
+    content.booking.hospitableTheme = D.booking.hospitableTheme;
+  }
   const kfRow = content.layout.find(s=>s.id==='keyfacts');
   if(kfRow) kfRow.name = 'Key Facts & FAQ';
   if(!content.faq){
@@ -723,7 +730,11 @@ function renderEditor(){
         + textField('Security note','booking.secureNote')
         + `<div class="field" style="margin-top:18px"><label>Live booking engine</label></div>`
         + textField('Engine API base','booking.apiBase','Your deployed booking-engine URL. When set, the exported site loads the live availability calendar + checkout widget. Clear to disable.')
-        + textField('Stripe publishable key','booking.stripePk','pk_live_… — the public key, safe to publish. Until set, the live calendar works but card checkout stays off.');
+        + textField('Stripe publishable key','booking.stripePk','pk_live_… — the public key, safe to publish. Until set, the live calendar works but card checkout stays off.')
+        + `<div class="field" style="margin-top:18px"><label>Hospitable widget (recommended)</label><div class="sub">When the Site UUID is filled, the booking section uses Hospitable's own widget — calendar, pricing and payment all handled by Hospitable. Clear the UUID to switch back to the custom engine journey above.</div></div>`
+        + textField('Hospitable Site UUID','booking.hospitableSiteUuid','From Direct Bookings → Website → widget code (data-site-uuid).')
+        + textField('Hospitable Property ID','booking.hospitablePropertyId')
+        + textField('Widget theme','booking.hospitableTheme','e.g. multi');
       break;
 
     case 'reviews':
@@ -1599,12 +1610,20 @@ function buildSite(c){
   <span id="availability" style="position:relative;top:-80px"></span>
   <div class="section-head" style="text-align:center"><div class="eyebrow">${esc(c.booking.eyebrow)}</div>
     <h2>${esc(c.booking.heading)}</h2><div class="rule center"></div><p>${esc(c.booking.intro)}</p></div>
-  <div id="bw-app" data-phone="${esc(B.phone)}" data-email="${esc(B.email)}">
+  ${c.booking.hospitableSiteUuid ? `
+  <div class="hospitable-embed">
+    <script src="https://cdn.hsptb.com/direct-booking-widget/widget-loader.prod.js"
+      data-site-uuid="${esc(c.booking.hospitableSiteUuid)}"
+      data-property-id="${esc(c.booking.hospitablePropertyId)}"
+      data-theme="${esc(c.booking.hospitableTheme||'multi')}">${'<'+'/script>'}
+  </div>
+  <p style="text-align:center;font-size:13px;margin-top:18px">Prefer to book in person? <a href="tel:${esc(B.phone.replace(/\s/g,''))}" style="color:var(--bronze)">${esc(B.phone)}</a> · <a href="mailto:${esc(B.email)}" style="color:var(--bronze)">${esc(B.email)}</a></p>
+  ` : `<div id="bw-app" data-phone="${esc(B.phone)}" data-email="${esc(B.email)}">
     <div class="checkout-card bw-fallback-note" style="text-align:center">
       <p style="margin-bottom:10px">Live availability and secure checkout load here.</p>
       <p style="font-size:14px">Prefer to book in person? <a href="tel:${esc(B.phone.replace(/\s/g,''))}" style="color:var(--bronze)">${esc(B.phone)}</a> · <a href="mailto:${esc(B.email)}" style="color:var(--bronze)">${esc(B.email)}</a></p>
     </div>
-  </div>
+  </div>`}
   <p class="secure-note" style="text-align:center;margin-top:22px">${esc(c.booking.secureNote)}</p>
 </div></section>`,
 
@@ -2011,7 +2030,7 @@ lb.querySelector('.lb-n').onclick=function(e){e.stopPropagation();show(cur+1);};
 lb.addEventListener('click',function(e){if(e.target===lb)lb.classList.remove('open');});
 document.addEventListener('keydown',function(e){if(!lb.classList.contains('open'))return;if(e.key==='Escape')lb.classList.remove('open');if(e.key==='ArrowLeft')show(cur-1);if(e.key==='ArrowRight')show(cur+1);});})();
 ${SC}
-${(c.booking && c.booking.apiBase) ? `<script src="https://js.stripe.com/v3/">${SC}<script src="/booking-widget.js" data-api="${esc(c.booking.apiBase)}" data-stripe-pk="${esc(c.booking.stripePk||'')}">${SC}` : ''}
+${(c.booking && c.booking.apiBase && !c.booking.hospitableSiteUuid) ? `<script src="https://js.stripe.com/v3/">${SC}<script src="/booking-widget.js" data-api="${esc(c.booking.apiBase)}" data-stripe-pk="${esc(c.booking.stripePk||'')}">${SC}` : ''}
 </body>
 </html>`;
 }
