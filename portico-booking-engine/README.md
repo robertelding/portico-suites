@@ -79,6 +79,13 @@ against developer.hospitable.com when credentials are in hand — all schema
 touchpoints are isolated in `lib/hospitable.js` (one normaliser function) so
 any drift is a five-minute fix in one file.
 
+## Vouchers
+
+Discount codes are stateless HMAC-signed strings (LABEL-PCT-YYMMDD-SIG) generated
+in the CMS Vouchers panel and verified by lib/vouchers.js with VOUCHER_SECRET.
+100% codes create comp bookings with no payment (admin alert fires). No storage:
+codes are private + expiry-bound; rotate VOUCHER_SECRET to revoke everything.
+
 ## Meta Ads drivers
 
 Campaign creation from the CMS supports two drivers (META_DRIVER):

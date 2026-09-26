@@ -20,6 +20,7 @@
   const $ = (id) => document.getElementById(id);
   const stripe = Stripe(STRIPE_PK);
   let elements, quote = null, liveDays = {};
+  const voucherCode = () => (document.getElementById('pw-promo')?.value || '').trim() || undefined;
 
   /* ── Live calendar ─────────────────────────────────────────────── */
   async function loadMonth(y, m) {
@@ -58,7 +59,7 @@
     const guests = parseInt(($('guestCount')?.textContent || '2')) || 2;
     const r = await fetch(`${API}/api/quote`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ checkIn: ci, checkOut: co, guests })
+      body: JSON.stringify({ checkIn: ci, checkOut: co, guests, voucherCode: voucherCode() })
     });
     const q = await r.json();
     if (!r.ok) { renderNotice(q.error || 'Those dates are unavailable.'); quote = null; return; }
@@ -81,7 +82,12 @@
       <div class="row"><span>Cleaning fee</span><span>${money(quote.cleaningFee)}</span></div>
       ${quote.tax ? `<div class="row"><span>Taxes</span><span>${money(quote.tax)}</span></div>` : ''}
       <div class="row" style="color:#7d9471;font-weight:600"><span>✓ ${quote.savingsLine.split(':')[0]}</span><span>${quote.savingsLine.split('(')[1]?.replace(')', '') || ''} saved</span></div>
-      <div class="row total"><span>Total</span><span>${money(quote.total)}</span></div>`;
+      ${quote.voucher ? `<div class="row" style="color:#8A6A3B;font-weight:600"><span>Voucher ${quote.voucher.label} (−${quote.voucher.pct}%)</span><span>−${money(quote.voucher.discount)}</span></div>` : ''}
+      <div class="row total"><span>Total</span><span>${money(quote.total)}</span></div>
+      <div class="promo-row" style="display:flex;gap:8px;margin-top:10px">
+        <input id="pw-promo" placeholder="Voucher code" value="${quote.voucher ? quote.voucher.code : ''}" style="flex:1;padding:9px 12px;border:1px solid #DCD4C2;border-radius:3px;font:inherit;text-transform:uppercase">
+        <button type="button" onclick="(function(){ if(typeof reprice==='function') reprice(); })()" id="pw-promo-apply" style="padding:9px 16px;border:1px solid #34402F;background:#34402F;color:#F3F0E8;border-radius:3px;cursor:pointer;font-size:11px;letter-spacing:1px;text-transform:uppercase">Apply</button>
+      </div>`;
     card.insertBefore(rows, card.querySelector('.pay-methods'));
     mountStripe();
   }
@@ -104,12 +110,40 @@
     fetch(`${API}/api/payments/intent`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ quoteId: quote.quoteId })
-    }).then(r => r.json()).then(({ clientSecret, error }) => {
+    }).then(r => r.json()).then(({ clientSecret, error, free }) => {
       if (error) return renderNotice(error);
+      if (free) return wireFreeConfirm();     // 100% voucher — no card form
       elements = stripe.elements({ clientSecret });
       elements.create('payment').mount('#bw-payment');
       wireConfirm(clientSecret);
     });
+  }
+
+
+  function collectGuest() {
+    const guest = { firstName: $('bw-fn').value.trim(), lastName: $('bw-ln').value.trim(),
+                    email: $('bw-em').value.trim(), phone: $('bw-ph').value.trim() };
+    if (!guest.firstName || !guest.email || !guest.phone) { renderNotice('Please complete name, email and mobile number.'); return null; }
+    return guest;
+  }
+
+  function wireFreeConfirm() {
+    const pay = document.getElementById('bw-payment');
+    if (pay) pay.innerHTML = '<div style="padding:14px;border:1px dashed #8A6A3B;border-radius:4px;color:#8A6A3B;font-size:13px">Voucher covers this stay in full — no payment required.</div>';
+    const btn = document.querySelector('#bw-checkout .btn') || document.querySelector('.bw-card .btn');
+    if (!btn) return;
+    btn.textContent = 'Confirm Booking';
+    btn.onclick = async () => {
+      const guest = collectGuest(); if (!guest) return;
+      btn.disabled = true; btn.textContent = 'Confirming…';
+      const r = await fetch(`${API}/api/reservations`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quoteId: quote.quoteId, paymentIntentId: null, guest })
+      });
+      const out = await r.json();
+      if (r.ok) location.href = out.redirect || (`/booking-confirmation?reservation_id=${out.reservationId}`);
+      else { renderNotice(out.error); btn.disabled = false; btn.textContent = 'Confirm Booking'; }
+    };
   }
 
   function wireConfirm(clientSecret) {

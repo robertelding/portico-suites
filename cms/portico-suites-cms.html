@@ -206,8 +206,8 @@ const DEFAULT_CONTENT = {
   hero:{
     eyebrow:'Franklin Road · Harrogate',
     heading:'Where Architecture Meets Hospitality',
-    sub:'A boutique stay defined by architectural heritage, thoughtful design and intuitive service — booked directly, with the best rate guaranteed.',
-    image:null, showLogo:true
+    sub:'A seven-bedroom Victorian holiday home in the heart of Harrogate — architectural heritage, thoughtful design and intuitive service, booked directly with the best rate guaranteed.',
+    image:'https://porticosuites.com/images/portico-suites-exterior-franklin-road.jpg', showLogo:true
   },
   pillars:[
     {title:'Architectural Heritage', sub:'A restored sense of place'},
@@ -219,20 +219,28 @@ const DEFAULT_CONTENT = {
     eyebrow:'The Suites', heading:'A Sense of Place & Timeless Hospitality',
     intro:'Explore the suites, garden and gathering spaces.',
     images:[
-      {label:'Exterior · Franklin Road elevation', src:null, size:'tall wide'},
-      {label:'Sitting room', src:null, size:''},
-      {label:'Kitchen', src:null, size:''},
-      {label:'Principal suite', src:null, size:''},
-      {label:'Bathroom', src:null, size:''},
-      {label:'Garden & terrace', src:null, size:'wide'},
-      {label:'Dining', src:null, size:''},
-      {label:'Second suite', src:null, size:''}
+      {label:'Franklin Road, Harrogate · Victorian stone elevation', src:'https://porticosuites.com/images/portico-suites-exterior-franklin-road.jpg', size:'tall wide'},
+      {label:'Sitting room · bay window & window seat', src:'https://porticosuites.com/images/portico-suites-living-room-bay-window.jpg', size:'wide'},
+      {label:'Sitting room · original fireplace', src:'https://porticosuites.com/images/portico-suites-living-room-fireplace.jpg', size:''},
+      {label:'Sitting room · leather & velvet', src:'https://porticosuites.com/images/portico-suites-living-room-leather-sofa.jpg', size:''},
+      {label:'Dining kitchen · seats the whole party', src:'https://porticosuites.com/images/portico-suites-dining-kitchen.jpg', size:'wide'},
+      {label:'Oak table & benches', src:'https://porticosuites.com/images/portico-suites-dining-kitchen-table.jpg', size:''},
+      {label:'Principal bedroom · with sitting area', src:'https://porticosuites.com/images/portico-suites-bedroom-principal.jpg', size:'tall'},
+      {label:'Bedroom · mustard', src:'https://porticosuites.com/images/portico-suites-bedroom-mustard.jpg', size:''},
+      {label:'Bedroom · garnet', src:'https://porticosuites.com/images/portico-suites-bedroom-garnet.jpg', size:''},
+      {label:'Bedroom · sage', src:'https://porticosuites.com/images/portico-suites-bedroom-sage.jpg', size:''},
+      {label:'Bedroom · silver', src:'https://porticosuites.com/images/portico-suites-bedroom-silver.jpg', size:''},
+      {label:'Bedroom · slate', src:'https://porticosuites.com/images/portico-suites-bedroom-slate.jpg', size:''},
+      {label:'Shower room', src:'https://porticosuites.com/images/portico-suites-shower-room.jpg', size:''},
+      {label:'En-suite', src:'https://porticosuites.com/images/portico-suites-ensuite.jpg', size:''},
+      {label:'Garden terrace · church spire views', src:'https://porticosuites.com/images/portico-suites-garden-terrace.jpg', size:'wide'},
+      {label:'Floorplan · 219 m² across four floors', src:'https://porticosuites.com/images/portico-suites-floorplan.jpg', size:'wide'}
     ]
   },
   amenities:{
     eyebrow:'Featured Amenities', heading:'Considered in Every Detail',
     items:[
-      {icon:'bed', title:'Sleeps 6', desc:'3 bedrooms · 2 baths (update to actual)'},
+      {icon:'bed', title:'Sleeps up to 10', desc:'7 bedrooms · 5 bathrooms, 4 en-suite'},
       {icon:'wifi', title:'Fast Wi-Fi', desc:'Reliable throughout, work-friendly'},
       {icon:'kitchen', title:'Full Kitchen', desc:'Cook as if you were at home'},
       {icon:'car', title:'Private Parking', desc:'Off-street, directly at the house'},
@@ -263,6 +271,7 @@ const DEFAULT_CONTENT = {
     eyebrow:'Reserve Direct', heading:'Secure Your Stay',
     intro:'Payments handled securely by Stripe or PayPal, with instant confirmation to your inbox.',
     currency:'£', nightlyRate:0, cleaningFee:0,
+    apiBase:'https://booking.porticosuites.com', stripePk:'',
     secureNote:'256-bit SSL · Powered by Stripe · Instant confirmation · No account required'
   },
   reviews:{
@@ -304,25 +313,38 @@ const DEFAULT_CONTENT = {
   },
   seo:{
     siteUrl:'https://porticosuites.com',
-    metaTitle:'Portico Suites Franklin Road — Boutique Stay in Harrogate | Book Direct',
-    metaDescription:'Portico Suites is a boutique holiday home on Franklin Road, Harrogate (HG1 5EN). Sleeps 6, private parking, fast Wi-Fi. Book direct for the best rate with instant confirmation.',
-    ogImage:null, answerBlock:true,
+    metaTitle:'7-Bedroom Holiday Home in Harrogate, Sleeps 10 | Portico Suites — Book Direct',
+    metaDescription:'Luxury 7-bedroom holiday home & group accommodation in central Harrogate (HG1 5EN). Sleeps 10 · 5 bathrooms · self-catering holiday let. Book direct for the best rate.',
+    ogImage:'https://porticosuites.com/images/portico-suites-exterior-franklin-road.jpg', answerBlock:true,
     facts:[
       {q:'Where is Portico Suites?', a:'Portico Suites is on Franklin Road in central Harrogate, North Yorkshire (postcode HG1 5EN), a short walk from the town centre and Harrogate rail station.'},
-      {q:'How many guests can stay?', a:'The house sleeps up to 6 guests across 3 bedrooms with 2 bathrooms.'},
+        {q:'Is Portico Suites a holiday rental?', a:'Yes — Portico Suites is a self-catering holiday home (holiday let) in central Harrogate, available for short breaks, group stays and longer visits, booked directly on this website.'},
+        {q:'Where can a group of 10 stay in Harrogate?', a:'Portico Suites sleeps up to 10 guests across 7 bedrooms with 5 bathrooms, making it one of the largest holiday homes in central Harrogate for families and groups.'},
+      {q:'How many guests can stay?', a:'The house sleeps up to 10 guests across 7 bedrooms set over four floors, with 5 bathrooms — 4 of them en-suite.'},
       {q:'How do I get the best rate?', a:'Book direct on this website — direct bookings carry no platform fees and beat Airbnb and Vrbo pricing for the same dates.'},
       {q:'Is booking instant?', a:'Yes. Payment is processed securely by Stripe or PayPal and confirmation is emailed instantly.'}
     ],
     tasks:{}, lastUpdated:''
   },
   custom:{},
+  vouchers:{ secret:'', issued:[] },
+  guidePages:[
+    {title:'Convention Centre Stays', url:'/harrogate-convention-centre-accommodation/'},
+    {title:'Corporate Accommodation', url:'/corporate-accommodation-harrogate/'},
+    {title:'Group Accommodation', url:'/group-accommodation-harrogate/'},
+    {title:'Family Weekends', url:'/large-family-accommodation-harrogate/'},
+    {title:'Weekend Breaks', url:'/weekend-breaks-harrogate/'},
+    {title:'Things To Do in Harrogate', url:'/things-to-do-harrogate/'}
+  ],
   faq:{
     heading:'Key Facts & FAQ',
     intro:'Quick answers about the suites, booking and staying in Harrogate.',
     categories:[
       {name:'Essentials', items:[
         {q:'Where is Portico Suites?', a:'Portico Suites is on Franklin Road in central Harrogate, North Yorkshire (postcode HG1 5EN), a short walk from the town centre and Harrogate rail station.'},
-        {q:'How many guests can stay?', a:'The house sleeps up to 6 guests across 3 bedrooms with 2 bathrooms.'},
+        {q:'Is Portico Suites a holiday rental?', a:'Yes — Portico Suites is a self-catering holiday home (holiday let) in central Harrogate, available for short breaks, group stays and longer visits, booked directly on this website.'},
+        {q:'Where can a group of 10 stay in Harrogate?', a:'Portico Suites sleeps up to 10 guests across 7 bedrooms with 5 bathrooms, making it one of the largest holiday homes in central Harrogate for families and groups.'},
+        {q:'How many guests can stay?', a:'The house sleeps up to 10 guests across 7 bedrooms set over four floors, with 5 bathrooms — 4 of them en-suite.'},
         {q:'What are check-in and check-out times?', a:'Check-in from 3:00 PM with self check-in via smart lock; check-out by 10:00 AM. Early check-in from 1:00 PM can be added during booking.'}
       ]},
       {name:'Booking & Payment', items:[
@@ -332,6 +354,8 @@ const DEFAULT_CONTENT = {
       ]},
       {name:'The Local Area', items:[
         {q:'How far is the town centre?', a:'Harrogate town centre, Bettys and the Valley Gardens are all within a short walk of Franklin Road.'},
+        {q:'How far is Harrogate Convention Centre?', a:'Portico Suites is about a 3-minute walk from the Harrogate Convention Centre, making it a practical base for exhibitors, delegates and event crews.'},
+        {q:'Do you take corporate and contractor bookings?', a:'Yes. The house works well for corporate groups, project teams and contractors Monday to Thursday, with fast Wi-Fi, a large dining table to work at, and 7 separate bedrooms so everyone gets their own room.'},
         {q:'Is parking available?', a:'Parking options are available nearby; a reserved space can be added during booking where offered.'}
       ]}
     ]
@@ -339,7 +363,7 @@ const DEFAULT_CONTENT = {
   fbads:{
     objective:'OUTCOME_TRAFFIC', dailyBudget:20, durationDays:14,
     adAccountId:'', pageId:'', pixelId:'', apiBase:'', adminKey:'',
-    headlines:[], primaries:[], imageSlots:[0,1,5],
+    headlines:[], primaries:[], imageSlots:[0,1,4],
     audiences:[
       {name:'UK short-break travellers', desc:'UK adults 28–65, interests: boutique hotels, spa breaks, weekend getaways, staycations', enabled:true},
       {name:'Harrogate & Yorkshire intent', desc:'People searching/engaging with Harrogate, Bettys, Yorkshire travel; 50km radius + rest of UK travellers to the area', enabled:true},
@@ -367,6 +391,9 @@ function normalizeContent(){
     const bi = content.layout.findIndex(s=>s.id==='blog');
     content.layout.splice(bi < 0 ? polIdx() : bi + 1, 0, {id:'keyfacts', name:'Key Facts & FAQ', visible:true});
   }
+  if(!content.vouchers) content.vouchers = { secret:'', issued:[] };
+  if(!content.guidePages) content.guidePages = JSON.parse(JSON.stringify(D.guidePages));
+  if(content.booking && content.booking.apiBase === undefined){ content.booking.apiBase = D.booking.apiBase; content.booking.stripePk = ''; }
   const kfRow = content.layout.find(s=>s.id==='keyfacts');
   if(kfRow) kfRow.name = 'Key Facts & FAQ';
   if(!content.faq){
@@ -426,6 +453,7 @@ const TABS = [
   {id:'subscribers', name:'Email Subscribers'},
   {id:'emailTpl', name:'Email Templates'},
   {id:'fbads', name:'Facebook Ads'},
+  {id:'vouchers', name:'Vouchers'},
   {id:'blog', name:'Blog / Journal'},
   {id:'faqTab', name:'FAQ / Key Facts'},
   {id:'seo', name:'SEO & AI Search'},
@@ -654,7 +682,10 @@ function renderEditor(){
         + textField('Currency symbol','booking.currency')
         + numField('Nightly rate','booking.nightlyRate','Set to 0 to show a placeholder until confirmed.')
         + numField('Cleaning fee','booking.cleaningFee')
-        + textField('Security note','booking.secureNote');
+        + textField('Security note','booking.secureNote')
+        + `<div class="field" style="margin-top:18px"><label>Live booking engine</label></div>`
+        + textField('Engine API base','booking.apiBase','Your deployed booking-engine URL. When set, the exported site loads the live availability calendar + checkout widget. Clear to disable.')
+        + textField('Stripe publishable key','booking.stripePk','pk_live_… — the public key, safe to publish. Until set, the live calendar works but card checkout stays off.');
       break;
 
     case 'reviews':
@@ -707,6 +738,26 @@ function renderEditor(){
             <button class="add-btn" onclick='addItem("faq.categories.${c}.items", JSON.stringify({q:"New question?", a:""}))'>+ Add Q&A to ${esc(cat.name)}</button>
           </div>`).join('')}
         <button class="add-btn" onclick='addItem("faq.categories", JSON.stringify({name:"New category", items:[{q:"New question?", a:""}]}))'>+ Add category</button>`;
+      break;
+    }
+
+    case 'vouchers': {
+      const V = content.vouchers;
+      html = `<h2>Discount Vouchers</h2>
+        <div class="hint">Generate signed codes for friends, comps and offers — validated by the booking engine, so they cannot be forged or edited. A <strong>100% code books the stay free</strong> (no card taken; you get an alert). Codes stop working at their expiry date; changing the secret revokes every code ever issued.</div>
+        ${textField('Voucher secret','vouchers.secret','Must exactly match VOUCHER_SECRET in the booking-engine environment (Render). Long and random — treat it like a password.')}
+        <div class="list-item"><div class="li-head"><span class="li-title">Generate a code</span></div>
+          <div class="field"><label>Label (who/what it is for)</label><input type="text" id="vLabel" placeholder="SARAH" maxlength="16" style="text-transform:uppercase"></div>
+          <div class="field"><label>Discount %</label><input type="number" id="vPct" value="100" min="1" max="100"></div>
+          <div class="field"><label>Expiry date</label><input type="date" id="vExp"></div>
+          <button class="add-btn" onclick="genVoucher()">✨ Generate code</button>
+          <div id="vOut" style="margin-top:12px"></div></div>
+        ${V.issued.length ? `<div class="field" style="margin-top:18px"><label>Issued codes (reference list — deleting here does not revoke)</label></div>` : ''}
+        ${V.issued.map((v,i)=>`<div class="user-row">
+          <span class="u-email" style="font-family:monospace">${esc(v.code)}</span>
+          <span class="u-role">${v.pct}% · exp ${esc(v.expires)}</span>
+          <button class="mini-btn" onclick="navigator.clipboard.writeText('${esc(v.code)}');toast('Copied')">Copy</button>
+          <button class="mini-btn danger" onclick="content.vouchers.issued.splice(${i},1);markDirty();renderEditor();">✕</button></div>`).join('')}`;
       break;
     }
 
@@ -967,6 +1018,31 @@ window.cmsCaptureEmail = async function(email){   // called by the preview ifram
   if(ok){ toast('New subscriber captured: ' + email); if(activeTab==='subscribers') renderEditor(); refreshPreview(); }
   return ok;
 };
+async function genVoucher(){
+  const V = content.vouchers;
+  const label = (document.getElementById('vLabel').value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const pct = parseInt(document.getElementById('vPct').value, 10);
+  const exp = document.getElementById('vExp').value;   // yyyy-mm-dd
+  const out = document.getElementById('vOut');
+  if(!V.secret) return out.innerHTML = '<div class="hint" style="color:#a04b3a">Set the voucher secret first (and the same value in Render as VOUCHER_SECRET).</div>';
+  if(!label || label.length < 2) return out.innerHTML = '<div class="hint" style="color:#a04b3a">Label needs 2–16 letters/numbers.</div>';
+  if(!(pct >= 1 && pct <= 100)) return out.innerHTML = '<div class="hint" style="color:#a04b3a">Discount must be 1–100%.</div>';
+  if(!exp || new Date(exp) < new Date()) return out.innerHTML = '<div class="hint" style="color:#a04b3a">Pick a future expiry date.</div>';
+  const yymmdd = exp.slice(2).replace(/-/g,'');
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', enc.encode(V.secret), {name:'HMAC', hash:'SHA-256'}, false, ['sign']);
+  const mac = await crypto.subtle.sign('HMAC', key, enc.encode(label + '|' + pct + '|' + yymmdd));
+  const sig = Array.from(new Uint8Array(mac)).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,6).toUpperCase();
+  const code = `${label}-${pct}-${yymmdd}-${sig}`;
+  V.issued.unshift({ code, pct, expires: exp, created: new Date().toISOString().slice(0,10) });
+  markDirty(); await 0;
+  out.innerHTML = `<div style="background:#FCFBF7;border:1px solid #C4A55E;border-radius:4px;padding:14px">
+    <div style="font-family:monospace;font-size:16px;letter-spacing:1px">${esc(code)}</div>
+    <div class="sub" style="margin-top:6px">${pct === 100 ? 'Books the stay completely free.' : pct + '% off the total.'} Valid until ${esc(exp)}. Guest types it in the Voucher box at checkout.</div>
+    <button class="mini-btn" style="margin-top:8px" onclick="navigator.clipboard.writeText('${esc(code)}');toast('Copied to clipboard')">Copy code</button></div>`;
+  renderEditor(); document.getElementById('vOut').innerHTML = out.innerHTML;
+}
+
 window.cmsDeleteSub = async function(email){       // called from the database view
   const i = subscribers.findIndex(s => s.email === email);
   if(i >= 0){ subscribers.splice(i,1); await saveSubs(); renderEditor(); refreshPreview(); toast('Subscriber removed'); }
@@ -1453,7 +1529,7 @@ function buildSite(c){
   <div class="section-head"><div class="eyebrow">${esc(c.gallery.eyebrow)}</div>
     <h2>${esc(c.gallery.heading)}</h2><div class="rule center"></div><p>${esc(c.gallery.intro)}</p></div>
   <div class="gallery-grid">${c.gallery.images.map(g => g.src
-    ? `<figure class="gimg ${g.size}"><img src="${g.src}" alt="${esc(g.label)}"><figcaption>${esc(g.label)}</figcaption></figure>`
+    ? `<figure class="gimg ${g.size}"><img src="${g.src}" alt="${esc(g.label)}" loading="lazy"><figcaption>${esc(g.label)}</figcaption></figure>`
     : `<div class="ph ${g.size}">${esc(g.label)}</div>`).join('')}
   </div>
 </div></section>`,
@@ -1600,10 +1676,15 @@ function buildSite(c){
   /* SEO head: meta, OG, canonical, JSON-LD */
   const siteUrl = (seo.siteUrl||'').replace(/\/$/,'');
   const lodging = {
-    "@context":"https://schema.org", "@type":"LodgingBusiness",
+    "@context":"https://schema.org", "@type":["LodgingBusiness","VacationRental"],
     "name": B.name, "description": seo.metaDescription || '',
+    "numberOfRooms": 7,
+    "occupancy": {"@type":"QuantitativeValue","maxValue":10,"unitText":"guests"},
+    "geo": {"@type":"GeoCoordinates","latitude":53.9989,"longitude":-1.5453},
+    "tourBookingPage": siteUrl || undefined,
     "url": siteUrl || undefined, "email": B.email, "telephone": B.phone,
     "address": {"@type":"PostalAddress","streetAddress":"Franklin Road","addressLocality":"Harrogate","addressRegion":"North Yorkshire","postalCode":"HG1 5EN","addressCountry":"GB"},
+    "image": c.gallery.images.filter(g=>g.src && /^https?:/.test(g.src)).slice(0,8).map(g=>g.src),
     "amenityFeature": c.amenities.items.map(a=>({"@type":"LocationFeatureSpecification","name":a.title,"value":true})),
     "dateModified": seo.lastUpdated || undefined
   };
@@ -1834,6 +1915,7 @@ ${bodySections}
       <p style="max-width:280px">${esc(c.footer.blurb)}</p>
     </div>
     <ul class="foot-links">
+      ${(c.guidePages||[]).map(g=>`<li><a href="${esc(g.url)}">${esc(g.title)}</a></li>`).join('')}
       ${vis('gallery')?'<li><a href="#gallery">The Suites</a></li>':''}
       ${vis('availability')?'<li><a href="#availability">Availability</a></li>':''}
       ${vis('booking')?'<li><a href="#book">Reserve</a></li>':''}
@@ -1875,6 +1957,7 @@ if(nlF){nlF.addEventListener('submit',function(ev){
 var RATE=${c.booking.nightlyRate||0},CLEAN=${c.booking.cleaningFee||0},CUR='${esc(c.booking.currency)}';
 ['checkin','checkout'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.addEventListener('change',function(){var ci=document.getElementById('checkin').value,co=document.getElementById('checkout').value;if(ci&&co){var n=Math.round((new Date(co)-new Date(ci))/86400000);if(n>0){var sd=document.getElementById('sumDates');if(sd)sd.textContent=ci+' → '+co;var sn=document.getElementById('sumNights');if(sn)sn.textContent=n+(n===1?' night':' nights');var st=document.getElementById('sumTotal');if(st&&RATE>0)st.textContent=CUR+(n*RATE+CLEAN);}}});});
 ${SC}
+${(c.booking && c.booking.apiBase) ? `<script src="https://js.stripe.com/v3/">${SC}<script src="/booking-widget.js" data-api="${esc(c.booking.apiBase)}" data-stripe-pk="${esc(c.booking.stripePk||'')}">${SC}` : ''}
 </body>
 </html>`;
 }

@@ -95,7 +95,7 @@ const TAX_PCT = 0;            // UK: set if registered / local taxes apply
 
 app.post('/api/quote', async (req, res) => {
   try {
-    const { checkIn, checkOut, guests = 2, addons = [] } = req.body;
+    const { checkIn, checkOut, guests = 2, addons = [], voucherCode } = req.body;
     const days = await getCalendar(PROPERTY_ID, checkIn, checkOut);
     const nights = days.filter(d => d.date >= checkIn && d.date < checkOut);
     if (!nights.length) return res.status(400).json({ error: 'Invalid date range' });
@@ -106,11 +106,16 @@ app.post('/api/quote', async (req, res) => {
     const addonItems = addons.filter(a => ADDONS[a]).map(a => ({ code: a, ...ADDONS[a] }));
     const addonTotal = addonItems.reduce((s, a) => s + a.amount, 0);
     const tax = Math.round(subtotal * TAX_PCT) / 100;
-    const total = Math.round((subtotal + CLEANING_FEE + addonTotal + tax) * 100) / 100;
+    const voucher = voucherCode ? verifyVoucher(voucherCode, process.env.VOUCHER_SECRET) : null;
+    if (voucherCode && !voucher) return res.status(400).json({ error: 'That voucher code is not valid or has expired' });
+    const preTotal = Math.round((subtotal + CLEANING_FEE + addonTotal + tax) * 100) / 100;
+    const discount = voucher ? Math.round(preTotal * voucher.pct) / 100 : 0;
+    const total = Math.round((preTotal - discount) * 100) / 100;
     const otaComparison = Math.round(total / (1 - DIRECT_SAVINGS_PCT / 100) * 100) / 100;
 
     const quote = { checkIn, checkOut, guests, addons, nights: nights.length,
-                    subtotal, cleaningFee: CLEANING_FEE, addonItems, tax, total, otaComparison };
+                    subtotal, cleaningFee: CLEANING_FEE, addonItems, tax, total, otaComparison,
+                    voucher: voucher ? { code: voucherCode.trim().toUpperCase(), label: voucher.label, pct: voucher.pct, discount } : null };
     res.json({ quoteId: storeQuote(quote), ...quote,
                savingsLine: `Direct Savings: ${DIRECT_SAVINGS_PCT}% vs Airbnb (£${(otaComparison - total).toFixed(2)})` });
   } catch (e) { res.status(502).json({ error: 'Could not price those dates' }); console.error(e); }
@@ -121,6 +126,7 @@ app.post('/api/payments/intent', async (req, res) => {
   try {
     const q = getQuote(req.body.quoteId);
     if (!q) return res.status(410).json({ error: 'Quote expired — please reprice' });
+    if (q.total <= 0) return res.json({ free: true });   // 100% voucher — no payment needed
     const intent = await stripe.paymentIntents.create({
       amount: Math.round(q.total * 100),
       currency: CURRENCY,
@@ -141,6 +147,15 @@ app.post('/api/reservations', async (req, res) => {
     if (!guest?.email || !guest?.phone || !guest?.firstName)
       return res.status(400).json({ error: 'Guest name, email and phone are required' });
 
+    if (q.total <= 0 && q.voucher && q.voucher.pct === 100) {
+      // Fully-comped stay via signed 100% voucher — no payment to verify.
+      // Server re-checks the signature so a tampered stored quote cannot slip through.
+      if (!verifyVoucher(q.voucher.code, process.env.VOUCHER_SECRET))
+        return res.status(402).json({ error: 'Voucher could not be re-verified' });
+      const freeRes = await createReservation({ quote: q, guest, paymentIntentId: null });
+      await adminAlert(`Comp booking via voucher ${q.voucher.code}: ${guest.firstName} ${guest.lastName || ''}, ${q.checkIn} → ${q.checkOut}`);
+      return res.json({ reservationId: freeRes.id, comp: true });
+    }
     const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
     if (intent.status !== 'succeeded' || intent.metadata.quoteId !== quoteId)
       return res.status(402).json({ error: 'Payment not verified' });
@@ -217,6 +232,7 @@ app.post('/webhooks/minut', async (req, res) => {
 });
 
 /* ── Meta Ads: campaign creation from the CMS (admin-key protected) ──── */
+const { verifyVoucher } = require('./lib/vouchers');
 const { createFullCampaign } = require('./lib/meta-ads');            // raw Graph API (fallback)
 const { createFullCampaignCLI, cliAvailable } = require('./lib/meta-ads-cli'); // official Meta Ads CLI (preferred)
 app.post('/api/meta/campaign', async (req, res) => {
