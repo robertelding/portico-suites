@@ -243,7 +243,7 @@ const DEFAULT_CONTENT = {
       {icon:'bed', title:'Sleeps up to 10', desc:'7 bedrooms · 5 bathrooms, 4 en-suite'},
       {icon:'wifi', title:'Fast Wi-Fi', desc:'Reliable throughout, work-friendly'},
       {icon:'kitchen', title:'Full Kitchen', desc:'Cook as if you were at home'},
-      {icon:'car', title:'Private Parking', desc:'Off-street, directly at the house'},
+      {icon:'car', title:'Parking', desc:'On street, free overnight'},
       {icon:'laundry', title:'Laundry', desc:'Washer & dryer in residence'},
       {icon:'leaf', title:'Garden', desc:'Sage greenery & quiet seating'},
       {icon:'paw', title:'Pet Friendly', desc:'Well-behaved dogs welcome'},
@@ -254,10 +254,10 @@ const DEFAULT_CONTENT = {
     eyebrow:'The Setting', heading:'Harrogate, From Franklin Road',
     body:'Set on a quiet, tree-lined terrace moments from the centre of Harrogate — spa town elegance, Bettys tea rooms, the Valley Gardens and the Stray all within an easy walk.',
     items:[
-      {name:'Harrogate town centre', time:'X min walk'},
-      {name:'Bettys Café Tea Rooms', time:'X min walk'},
-      {name:'Valley Gardens', time:'X min walk'},
-      {name:'Harrogate rail station', time:'X min walk'}
+      {name:'Harrogate town centre', time:'7 min walk'},
+      {name:'Bettys Café Tea Rooms', time:'10 min walk'},
+      {name:'Valley Gardens', time:'10 min walk'},
+      {name:'Harrogate rail station', time:'12 min walk'}
     ],
     mapUrl:'https://maps.google.com/maps?q=HG1+5EN&z=15&output=embed'
   },
@@ -302,13 +302,50 @@ const DEFAULT_CONTENT = {
     success:'Thank you — you are on the list.'
   },
   blog:{
+    enabled:true,
     eyebrow:'The Journal', heading:'Notes From Franklin Road',
     intro:'Guides, news and seasonal notes from the house.',
     posts:[
-      {id:'p1', title:'A Perfect Weekend in Harrogate', date:'2026-08-01',
-       excerpt:'Where to eat, walk and unwind within ten minutes of the front door — our honest local shortlist.',
-       body:'Start with breakfast at Bettys, then walk it off through the Valley Gardens.\n\nReplace this sample post with your own — each post supports multiple paragraphs, a cover photo and its own search listing.',
-       image:null, published:true}
+      {id:'j1', title:'Three Minutes to the Halls: The Exhibitor’s Guide to Harrogate', date:'2026-09-24',
+       image:'https://porticosuites.com/images/portico-suites-exterior-franklin-road.jpg',
+       excerpt:'How trade-show teams turn Convention Centre weeks from a logistics headache into the easiest part of the job.',
+       body:'Every show at the HCC empties the town’s hotels within weeks of dates being announced — and scatters teams across Harrogate in the process. The alternative is simpler: one house, seven private bedrooms, three minutes’ walk from the halls.\n\nThe rhythm of a show week changes when base camp is that close. Build-up mornings start with a proper breakfast at the big table; breakdown evenings end with the kettle on minutes after the shutters come down. One booking, one invoice line, and nobody draws the short straw on a distant hotel.\n\nOur guide to accommodation for specific shows — from the Flooring Show to Home & Gift — is linked in the footer.', published:true},
+      {id:'j2', title:'The Perfect Harrogate Weekend for a Group of Ten', date:'2026-09-17',
+       image:'https://porticosuites.com/images/portico-suites-living-room-bay-window.jpg',
+       excerpt:'Forty-eight hours, ten people, zero hotel-corridor logistics — the weekend template our guests keep repeating.',
+       body:'Friday: arrive to smart-lock self check-in, beds made, and the sitting room ready for the first drink of the weekend. Saturday: Bettys for breakfast, the Montpellier Quarter for wandering, the Turkish Baths for an hour of Victorian steam, dinner in town and a slow walk home.\n\nSunday belongs to the Valley Gardens — or a run out to Fountains Abbey — before the drive home. The difference a whole house makes is simple: every evening happens together, in one room, rather than along a corridor of hotel doors.', published:true},
+      {id:'j3', title:'Knaresborough with Kids: Boats, Castles and Ice Cream', date:'2026-09-10',
+       image:'https://porticosuites.com/images/attraction-knaresborough-viaduct.jpg',
+       excerpt:'One train stop away sits the easiest family half-day in Yorkshire.',
+       body:'The view from the castle grounds — the great viaduct striding over the Nidd — is the one everybody photographs, but the day belongs to the river: rowing boats by the hour, riverside paths flat enough for every generation, and ice cream at both ends.\n\nAdd Mother Shipton’s Cave, England’s oldest visitor attraction, and Wednesday’s market in the square, and you have a half-day that asks nothing of the driver: the train from Harrogate takes minutes, and the station is a twelve-minute walk from our front door.', published:true},
+      {id:'j4', title:'Where to Eat in Harrogate Right Now: A Local Shortlist', date:'2026-09-03',
+       image:'https://porticosuites.com/images/portico-suites-dining-kitchen.jpg',
+       excerpt:'The quarters, the bookings worth making, and the honest tips for tables of ten.',
+       body:'Head for the Montpellier Quarter when in doubt — it remains the bistro heart of town — with Cold Bath Road close behind for neighbourhood favourites. Bettys is the ceremony: queue for breakfast or book ahead, and regret neither.\n\nThe honest tip for groups: reserve ahead everywhere at weekends, especially in show and race seasons. And when the town is booked out, the house fights back — an oak table for ten and a kitchen that local private chefs know well.', published:true},
+      {id:'j5', title:'Fountains Abbey: Planning the District’s Grandest Day Out', date:'2026-08-27',
+       image:'https://porticosuites.com/images/attraction-fountains-abbey.jpg',
+       excerpt:'World Heritage ruins, Georgian water gardens and a deer park — how to do it properly.',
+       body:'Give it a full, unhurried day. The abbey ruins reward slow walking — the vaulted cellarium is the photograph everyone leaves with — before the path opens into Studley Royal’s water gardens and the deer park beyond.\n\nIt sits roughly twenty-five minutes from Franklin Road by car, and pairs beautifully with Ripley’s castle and village on the way home. National Trust members visit free; everyone else should still consider it the best-value day in the district.', published:true},
+      {id:'j6', title:'Brimham Rocks and the Washburn Valley: Walks from the Doorstep', date:'2026-08-20',
+       image:'https://porticosuites.com/images/attraction-brimham-rocks.jpg',
+       excerpt:'Nidderdale starts minutes from town — here are the two walks we send every guest to first.',
+       body:'Brimham Rocks is the crowd-pleaser: acres of wind-carved gritstone sculptures that children treat as a natural climbing frame and photographers treat as a studio, with Nidderdale rolling away below.\n\nQuieter, and closer still, the Washburn Valley strings together Fewston and Swinsty reservoirs with level woodland circuits — the reliable leg-stretch when half the group wants a walk and the other half wants to be back for lunch.', published:true},
+      {id:'j7', title:'Why Big Families Choose a Townhouse Over a Row of Hotel Rooms', date:'2026-08-13',
+       image:'https://porticosuites.com/images/portico-suites-bedroom-principal.jpg',
+       excerpt:'Multi-generation trips succeed on architecture: four floors, seven doors, one table.',
+       body:'The failure mode of the three-generation holiday is well known: the family scattered along a corridor, negotiating breakfast windows. A vertical Victorian townhouse solves it structurally — early-rising grandparents, napping toddlers and nocturnal teenagers each get a floor’s worth of distance.\n\nThe togetherness happens where it should: one sitting room, one long oak table, and a town outside built for every walking speed.', published:true},
+      {id:'j8', title:'Harrogate’s Event Calendar: When to Book Early', date:'2026-08-06',
+       image:'https://porticosuites.com/images/portico-suites-living-room-fireplace.jpg',
+       excerpt:'Show weeks, race days and festival summers — the dates that empty the town’s beds first.',
+       body:'Harrogate runs on its calendar. Trade shows at the Convention Centre — flooring in the autumn, gifting in deep winter, weddings and nurseries between — book the town solid, and July stacks the Great Yorkshire Show against festival season.\n\nThe practical rule: if your dates touch an event week, book the moment plans firm up. Direct booking guarantees our best rate whenever you land.', published:true},
+      {id:'j9', title:'Book Direct vs the Platforms: What the 12% Really Means', date:'2026-07-30',
+       image:'https://porticosuites.com/images/portico-suites-living-room-leather-sofa.jpg',
+       excerpt:'The same house, the same dates — and why the direct price is always the better one.',
+       body:'Online travel platforms add service fees that can push a group booking’s total up substantially — money that buys nothing extra for the guest. Booking direct removes that layer entirely, which is why our direct rate beats the platforms for identical dates.\n\nDirect guests also deal with the owner, not a call centre: instant confirmation, straight answers, and one payment for the whole house.', published:true},
+      {id:'j10', title:'Inside the House: Seven Bedrooms Across Four Floors', date:'2026-07-23',
+       image:'https://porticosuites.com/images/portico-suites-floorplan.jpg',
+       excerpt:'A tour of the layout — and why 219 square metres works so well for groups of ten.',
+       body:'The floorplan tells the story better than adjectives: a ground floor holding the bay-windowed sitting room, an en-suite bedroom and the long dining kitchen; three more floors stacking six further bedrooms and four more bathrooms above.\n\nFive bathrooms — four of them en-suite — is the number guests notice most. Mornings simply never queue, whether the party is a wedding’s worth of family or a full exhibition team.', published:true}
     ]
   },
   seo:{
@@ -1618,10 +1655,13 @@ function buildSite(c){
       if(!posts.length) return `<section id="blog"><div class="wrap"><div class="section-head">
         <div class="eyebrow">${esc(c.blog?.eyebrow||'')}</div><h2>${esc(c.blog?.heading||'')}</h2>
         <div class="rule center"></div><p>New posts coming soon.</p></div></div></section>`;
+      const sorted = [...posts].sort((a,b)=> String(b.date||'').localeCompare(String(a.date||'')));
+      const featured = sorted.slice(0,3), rest = sorted.slice(3);
+      const slugOf = t => 'post-' + (t||'post').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
       return `<section id="blog"><div class="wrap">
   <div class="section-head"><div class="eyebrow">${esc(c.blog.eyebrow)}</div>
     <h2>${esc(c.blog.heading)}</h2><div class="rule center"></div><p>${esc(c.blog.intro)}</p></div>
-  <div class="blog-grid">${posts.map(p=>{
+  <div class="blog-grid">${featured.map(p=>{
     const slug = 'post-' + (p.title||'post').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     return `<a class="blog-card" href="#${slug}">
       ${p.image ? `<div class="blog-thumb"><img src="${p.image}" alt="${esc(p.title)}"></div>` : `<div class="blog-thumb ph" style="height:180px">Cover photo</div>`}
@@ -1629,7 +1669,8 @@ function buildSite(c){
       <h3>${esc(p.title)}</h3><p>${esc(p.excerpt)}</p>
       <span class="blog-more">Read the post →</span></div></a>`;}).join('')}
   </div>
-  ${posts.map(p=>{
+  ${rest.length ? `<div class="blog-morelist"><span>More from the Journal:</span>${rest.map(p=>`<a href="#${slugOf(p.title)}">${esc(p.title)}</a>`).join('')}</div>` : ''}
+  ${sorted.map(p=>{
     const slug = 'post-' + (p.title||'post').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     const paras = (p.body||'').split(/\n\s*\n/).filter(x=>x.trim()).map(x=>`<p>${esc(x)}</p>`).join('');
     return `<article class="blog-article" id="${slug}">
@@ -1885,6 +1926,21 @@ footer a:hover{color:var(--gold)}
 .blog-card p{font-size:13px;font-weight:300;color:#5c5a51}
 .blog-more{display:inline-block;margin-top:12px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--bronze)}
 @media(max-width:820px){.blog-grid{grid-template-columns:1fr}}
+.blog-morelist{margin-top:26px;text-align:center;font-size:12px;letter-spacing:.04em;line-height:2.2}
+.blog-morelist span{color:var(--bronze);text-transform:uppercase;letter-spacing:.18em;font-size:10px;margin-right:10px}
+.blog-morelist a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--stone);margin:0 10px;white-space:nowrap}
+.blog-morelist a:hover{color:var(--bronze);border-color:var(--bronze)}
+.gimg{cursor:zoom-in}
+.lb{position:fixed;inset:0;background:rgba(24,28,21,.95);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:300;padding:24px}
+.lb.open{display:flex}
+.lb img{max-width:92vw;max-height:76vh;border-radius:3px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.lb-cap{color:var(--ivory2);font-size:13px;letter-spacing:.08em;margin-top:16px;text-align:center}
+.lb-x,.lb-p,.lb-n{position:fixed;background:none;border:none;color:var(--ivory);cursor:pointer;opacity:.75;font-family:inherit}
+.lb-x:hover,.lb-p:hover,.lb-n:hover{opacity:1}
+.lb-x{top:16px;right:22px;font-size:34px}
+.lb-p,.lb-n{top:50%;transform:translateY(-50%);font-size:46px;padding:14px}
+.lb-p{left:10px}.lb-n{right:10px}
+@media(max-width:820px){.lb-p{left:2px}.lb-n{right:2px}.lb-p,.lb-n{font-size:36px}}
 .blog-article{display:none;max-width:720px;margin:56px auto 0;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:48px}
 .blog-article:target{display:block}
 .blog-article h2{font-size:28px;letter-spacing:.05em;margin-bottom:8px}
@@ -1956,6 +2012,17 @@ if(nlF){nlF.addEventListener('submit',function(ev){
 });}
 var RATE=${c.booking.nightlyRate||0},CLEAN=${c.booking.cleaningFee||0},CUR='${esc(c.booking.currency)}';
 ['checkin','checkout'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.addEventListener('change',function(){var ci=document.getElementById('checkin').value,co=document.getElementById('checkout').value;if(ci&&co){var n=Math.round((new Date(co)-new Date(ci))/86400000);if(n>0){var sd=document.getElementById('sumDates');if(sd)sd.textContent=ci+' → '+co;var sn=document.getElementById('sumNights');if(sn)sn.textContent=n+(n===1?' night':' nights');var st=document.getElementById('sumTotal');if(st&&RATE>0)st.textContent=CUR+(n*RATE+CLEAN);}}});});
+(function(){var figs=[].slice.call(document.querySelectorAll('#gallery .gimg'));if(!figs.length)return;
+var lb=document.createElement('div');lb.className='lb';lb.innerHTML='<button class="lb-x" aria-label="Close">×</button><button class="lb-p" aria-label="Previous">‹</button><img alt=""><button class="lb-n" aria-label="Next">›</button><div class="lb-cap"></div>';
+document.body.appendChild(lb);
+var img=lb.querySelector('img'),cap=lb.querySelector('.lb-cap'),cur=0;
+function show(i){cur=(i+figs.length)%figs.length;var f=figs[cur];img.src=f.querySelector('img').src;img.alt=f.querySelector('img').alt||'';cap.textContent=(f.querySelector('figcaption')||{}).textContent||'';lb.classList.add('open');}
+figs.forEach(function(f,i){f.addEventListener('click',function(){show(i);});});
+lb.querySelector('.lb-x').onclick=function(){lb.classList.remove('open');};
+lb.querySelector('.lb-p').onclick=function(e){e.stopPropagation();show(cur-1);};
+lb.querySelector('.lb-n').onclick=function(e){e.stopPropagation();show(cur+1);};
+lb.addEventListener('click',function(e){if(e.target===lb)lb.classList.remove('open');});
+document.addEventListener('keydown',function(e){if(!lb.classList.contains('open'))return;if(e.key==='Escape')lb.classList.remove('open');if(e.key==='ArrowLeft')show(cur-1);if(e.key==='ArrowRight')show(cur+1);});})();
 ${SC}
 ${(c.booking && c.booking.apiBase) ? `<script src="https://js.stripe.com/v3/">${SC}<script src="/booking-widget.js" data-api="${esc(c.booking.apiBase)}" data-stripe-pk="${esc(c.booking.stripePk||'')}">${SC}` : ''}
 </body>
