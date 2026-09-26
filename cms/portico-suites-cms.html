@@ -195,7 +195,6 @@ const DEFAULT_CONTENT = {
     {id:'gallery', name:'Gallery / Showcase', visible:true},
     {id:'amenities', name:'Amenities', visible:true},
     {id:'location', name:'Location & Map', visible:true},
-    {id:'availability', name:'Availability Calendar', visible:true},
     {id:'booking', name:'Secure Checkout', visible:true},
     {id:'reviews', name:'Guest Reviews', visible:true},
     {id:'blog', name:'Blog / Journal', visible:true},
@@ -429,6 +428,8 @@ function normalizeContent(){
     content.layout.splice(bi < 0 ? polIdx() : bi + 1, 0, {id:'keyfacts', name:'Key Facts & FAQ', visible:true});
   }
   if(!content.vouchers) content.vouchers = { secret:'', issued:[] };
+  content.layout = content.layout.filter(s => s.id !== 'availability');
+  const bkRow = content.layout.find(s=>s.id==='booking'); if(bkRow) bkRow.name = 'Booking & Availability';
   if(!content.guidePages) content.guidePages = JSON.parse(JSON.stringify(D.guidePages));
   if(content.booking && content.booking.apiBase === undefined){ content.booking.apiBase = D.booking.apiBase; content.booking.stripePk = ''; }
   const kfRow = content.layout.find(s=>s.id==='keyfacts');
@@ -1591,42 +1592,20 @@ function buildSite(c){
   <div class="map-frame"><iframe title="Map" loading="lazy" src="${esc(c.location.mapUrl)}"></iframe></div>
 </div></div></section>`,
 
-    availability: `
-<section class="cal-section" id="availability"><div class="wrap" style="text-align:center">
-  <div class="eyebrow">${esc(c.availability.eyebrow)}</div>
-  <h2 style="font-size:30px;letter-spacing:.06em">${esc(c.availability.heading)}</h2>
-  <p style="opacity:.85;max-width:560px;margin:16px auto 0;font-weight:300">${esc(c.availability.intro)}</p>
-  <div class="cal-card">
-    <div class="cal-head">
-      <button type="button" aria-label="Previous month" onclick="changeMonth(-1)">‹</button>
-      <strong class="serif" id="calTitle"></strong>
-      <button type="button" aria-label="Next month" onclick="changeMonth(1)">›</button>
-    </div>
-    <div class="cal-grid" id="calGrid"></div>
-    <div class="cal-legend">
-      <span><span class="dot" style="background:var(--ivory);border:1px solid var(--line)"></span>Available</span>
-      <span><span class="dot" style="background:var(--ivory-deep)"></span>Reserved</span>
-    </div>
-  </div>
-  <div class="sync-badges">${c.availability.badges.map(b=>`<span class="sync-badge">${esc(b)}</span>`).join('')}</div>
-</div></section>`,
+    availability: '',
 
     booking: `
-<section id="book"><div class="wrap" style="text-align:center">
-  <div class="section-head"><div class="eyebrow">${esc(c.booking.eyebrow)}</div>
+<section class="cal-section" id="book"><div class="wrap">
+  <span id="availability" style="position:relative;top:-80px"></span>
+  <div class="section-head" style="text-align:center"><div class="eyebrow">${esc(c.booking.eyebrow)}</div>
     <h2>${esc(c.booking.heading)}</h2><div class="rule center"></div><p>${esc(c.booking.intro)}</p></div>
-  <div class="checkout-card">
-    <div class="row"><span id="sumDates">Select dates above</span><span id="sumNights"></span></div>
-    <div class="row"><span>Nightly rate</span><span>${c.booking.nightlyRate>0 ? esc(c.booking.currency)+c.booking.nightlyRate : esc(c.booking.currency)+'XXX <em style="color:#8a8272">(set rate)</em>'}</span></div>
-    <div class="row"><span>Cleaning fee</span><span>${esc(c.booking.currency)}${c.booking.cleaningFee||'XX'}</span></div>
-    <div class="row total"><span>Total</span><span id="sumTotal">${esc(c.booking.currency)}—</span></div>
-    <div class="pay-methods" role="group" aria-label="Payment method">
-      <div class="pay-chip active" onclick="pickPay(this)">Card</div>
-      <div class="pay-chip" onclick="pickPay(this)">PayPal</div>
+  <div id="bw-app" data-phone="${esc(B.phone)}" data-email="${esc(B.email)}">
+    <div class="checkout-card bw-fallback-note" style="text-align:center">
+      <p style="margin-bottom:10px">Live availability and secure checkout load here.</p>
+      <p style="font-size:14px">Prefer to book in person? <a href="tel:${esc(B.phone.replace(/\s/g,''))}" style="color:var(--bronze)">${esc(B.phone)}</a> · <a href="mailto:${esc(B.email)}" style="color:var(--bronze)">${esc(B.email)}</a></p>
     </div>
-    <button class="btn" style="width:100%" type="button">Confirm &amp; Pay Securely</button>
-    <p class="secure-note">${esc(c.booking.secureNote)}</p>
   </div>
+  <p class="secure-note" style="text-align:center;margin-top:22px">${esc(c.booking.secureNote)}</p>
 </div></section>`,
 
     reviews: `
@@ -1933,6 +1912,29 @@ footer a:hover{color:var(--gold)}
 .lb-p,.lb-n{top:50%;transform:translateY(-50%);font-size:46px;padding:14px}
 .lb-p{left:10px}.lb-n{right:10px}
 @media(max-width:820px){.lb-p{left:2px}.lb-n{right:2px}.lb-p,.lb-n{font-size:36px}}
+.bw-cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;max-width:1000px;margin:44px auto 0;align-items:start;text-align:left}
+.bw-cols .checkout-card{max-width:none;margin:0}
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.cal-head button{background:none;border:1px solid var(--stone);border-radius:var(--radius);width:34px;height:34px;font-size:18px;cursor:pointer;color:var(--olive)}
+.cal-head button:hover{border-color:var(--bronze);color:var(--bronze)}
+.cal-title{font-family:'Cinzel',serif;letter-spacing:.12em;font-size:14px;color:var(--olive)}
+.cal-grid .day.free{cursor:pointer}
+.cal-grid .day.free:hover{background:var(--stone)}
+.cal-grid .day.sel{background:var(--olive);color:var(--ivory)}
+.cal-grid .day.inr{background:var(--sage);color:var(--ivory)}
+.bw-hint{font-size:11px;letter-spacing:.06em;color:#8a8272;margin-top:12px;text-align:center}
+.bw-guests{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--ivory-deep);font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.bw-form{margin-top:18px}
+.bw-form input{width:100%;padding:12px 14px;border:1px solid var(--stone);border-radius:var(--radius);font-family:inherit;font-size:14px;margin-bottom:10px;background:var(--ivory)}
+.bw-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bw-cta{width:100%;margin-top:6px}
+#bw-payment{margin:6px 0 12px}
+.bw-promo{display:flex;gap:8px;margin-top:14px}
+.bw-promo input{flex:1;padding:10px 12px;border:1px solid var(--stone);border-radius:var(--radius);font-family:inherit;text-transform:uppercase;background:var(--ivory)}
+.bw-promo button{padding:10px 16px;border:1px solid var(--olive);background:var(--olive);color:var(--ivory);border-radius:var(--radius);cursor:pointer;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.bw-notice{margin-top:12px;padding:12px 14px;border:1px solid #cbb8a0;border-radius:var(--radius);font-size:13px;color:#7a5c46;background:#faf6ee}
+.bw-notice a{color:var(--bronze)}
+@media(max-width:900px){.bw-cols{grid-template-columns:1fr}}
 .blog-article{display:none;max-width:720px;margin:56px auto 0;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:48px}
 .blog-article:target{display:block}
 .blog-article h2{font-size:28px;letter-spacing:.05em;margin-bottom:8px}
@@ -1984,11 +1986,6 @@ var guests=2;
 function adjustGuests(d){guests=Math.min(10,Math.max(1,guests+d));var el=document.getElementById('guestCount');if(el)el.textContent=guests+(guests===1?' guest':' guests');}
 function pickPay(el){document.querySelectorAll('.pay-chip').forEach(function(c){c.classList.remove('active')});el.classList.add('active');}
 function showPolicy(i,btn){document.querySelectorAll('.policy-tabs button').forEach(function(b){b.classList.remove('active')});document.querySelectorAll('.policy-panel').forEach(function(p){p.classList.remove('active')});btn.classList.add('active');document.querySelectorAll('.policy-panel')[i].classList.add('active');}
-var calDate=new Date(2026,7,1);
-var demoBooked={'2026-8':[7,8,9,14,15,21,22,23,28,29],'2026-9':[4,5,11,12,18,19,25,26]};
-function renderCal(){var g=document.getElementById('calGrid');if(!g)return;var y=calDate.getFullYear(),m=calDate.getMonth();document.getElementById('calTitle').textContent=calDate.toLocaleString('en-GB',{month:'long',year:'numeric'});g.innerHTML='';['M','T','W','T','F','S','S'].forEach(function(d){var e=document.createElement('div');e.className='dow';e.textContent=d;g.appendChild(e);});var f=(new Date(y,m,1).getDay()+6)%7;var days=new Date(y,m+1,0).getDate();var bk=demoBooked[y+'-'+(m+1)]||[];for(var i=0;i<f;i++){var b=document.createElement('div');b.className='day blank';g.appendChild(b);}for(var d=1;d<=days;d++){var e2=document.createElement('div');e2.className='day'+(bk.indexOf(d)>-1?' booked':'');e2.textContent=d;g.appendChild(e2);}}
-function changeMonth(d){calDate.setMonth(calDate.getMonth()+d);renderCal();}
-renderCal();
 var nlF=document.getElementById('nlForm');
 if(nlF){nlF.addEventListener('submit',function(ev){
   var em=document.getElementById('nlEmail').value.trim();
@@ -2002,8 +1999,6 @@ if(nlF){nlF.addEventListener('submit',function(ev){
   ${c.newsletter?.endpoint ? `msg.textContent='Sending…';` :
   `ev.preventDefault();window.location.href='mailto:${esc(B.email)}?subject='+encodeURIComponent('Newsletter signup')+'&body='+encodeURIComponent('Please add me to the list: '+em);msg.textContent='Opening your email app to confirm…';`}
 });}
-var RATE=${c.booking.nightlyRate||0},CLEAN=${c.booking.cleaningFee||0},CUR='${esc(c.booking.currency)}';
-['checkin','checkout'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.addEventListener('change',function(){var ci=document.getElementById('checkin').value,co=document.getElementById('checkout').value;if(ci&&co){var n=Math.round((new Date(co)-new Date(ci))/86400000);if(n>0){var sd=document.getElementById('sumDates');if(sd)sd.textContent=ci+' → '+co;var sn=document.getElementById('sumNights');if(sn)sn.textContent=n+(n===1?' night':' nights');var st=document.getElementById('sumTotal');if(st&&RATE>0)st.textContent=CUR+(n*RATE+CLEAN);}}});});
 (function(){var figs=[].slice.call(document.querySelectorAll('#gallery .gimg'));if(!figs.length)return;
 var lb=document.createElement('div');lb.className='lb';lb.innerHTML='<button class="lb-x" aria-label="Close">×</button><button class="lb-p" aria-label="Previous">‹</button><img alt=""><button class="lb-n" aria-label="Next">›</button><div class="lb-cap"></div>';
 document.body.appendChild(lb);
