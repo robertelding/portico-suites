@@ -319,12 +319,15 @@ footer a:hover{color:var(--gold)}
   <span id="availability" style="position:relative;top:-80px"></span>
   <div class="section-head" style="text-align:center"><div class="eyebrow">Reserve Direct</div>
     <h2>Secure Your Stay</h2><div class="rule center"></div><p>Payments handled securely by Stripe or PayPal, with instant confirmation to your inbox.</p></div>
-  <div id="bw-app" data-phone="+44 7470 389953" data-email="info@porticosuites.com">
-    <div class="checkout-card bw-fallback-note" style="text-align:center">
-      <p style="margin-bottom:10px">Live availability and secure checkout load here.</p>
-      <p style="font-size:14px">Prefer to book in person? <a href="tel:+447470389953" style="color:var(--bronze)">+44 7470 389953</a> · <a href="mailto:info@porticosuites.com" style="color:var(--bronze)">info@porticosuites.com</a></p>
-    </div>
+  
+  <div class="hospitable-embed">
+    <script src="https://cdn.hsptb.com/direct-booking-widget/widget-loader.prod.js"
+      data-site-uuid="a2c4edd4-3b79-4270-a2e5-b2cd1475eea4"
+      data-property-id="2466600"
+      data-theme="multi"></script>
   </div>
+  <p style="text-align:center;font-size:13px;margin-top:18px">Prefer to book in person? <a href="tel:+447470389953" style="color:var(--bronze)">+44 7470 389953</a> · <a href="mailto:info@porticosuites.com" style="color:var(--bronze)">info@porticosuites.com</a></p>
+  
   <p class="secure-note" style="text-align:center;margin-top:22px">256-bit SSL · Powered by Stripe · Instant confirmation · No account required</p>
 </div></section>
 
@@ -456,6 +459,6 @@ lb.querySelector('.lb-n').onclick=function(e){e.stopPropagation();show(cur+1);};
 lb.addEventListener('click',function(e){if(e.target===lb)lb.classList.remove('open');});
 document.addEventListener('keydown',function(e){if(!lb.classList.contains('open'))return;if(e.key==='Escape')lb.classList.remove('open');if(e.key==='ArrowLeft')show(cur-1);if(e.key==='ArrowRight')show(cur+1);});})();
 </script>
-<script src="https://js.stripe.com/v3/"></script><script src="/booking-widget.js" data-api="https://booking.porticosuites.com" data-stripe-pk=""></script>
+
 </body>
 </html>
