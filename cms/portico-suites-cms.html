@@ -354,6 +354,7 @@ const DEFAULT_CONTENT = {
     metaTitle:'7-Bedroom Holiday Home in Harrogate, Sleeps 10 | Portico Suites — Book Direct',
     metaDescription:'Luxury 7-bedroom holiday home & group accommodation in central Harrogate (HG1 5EN). Sleeps 10 · 5 bathrooms · self-catering holiday let. Book direct for the best rate.',
     ogImage:'https://porticosuites.com/images/portico-suites-exterior-franklin-road.jpg', answerBlock:true,
+    latitude:'53.9989', longitude:'-1.5453', propertyId:'2466600',
     facts:[
       {q:'Where is Portico Suites?', a:'Portico Suites is on Franklin Road in central Harrogate, North Yorkshire (postcode HG1 5EN), a short walk from the town centre and Harrogate rail station.'},
         {q:'Is Portico Suites a holiday rental?', a:'Yes — Portico Suites is a self-catering holiday home (holiday let) in central Harrogate, available for short breaks, group stays and longer visits, booked directly on this website.'},
@@ -430,6 +431,7 @@ function normalizeContent(){
     content.layout.splice(bi < 0 ? polIdx() : bi + 1, 0, {id:'keyfacts', name:'Key Facts & FAQ', visible:true});
   }
   if(!content.vouchers) content.vouchers = { secret:'', issued:[] };
+  if(content.seo && content.seo.latitude === undefined){ content.seo.latitude = D.seo.latitude; content.seo.longitude = D.seo.longitude; content.seo.propertyId = D.seo.propertyId; }
   content.layout = content.layout.filter(s => s.id !== 'availability');
   const bkRow = content.layout.find(s=>s.id==='booking'); if(bkRow) bkRow.name = 'Booking & Availability';
   if(!content.guidePages) content.guidePages = JSON.parse(JSON.stringify(D.guidePages));
@@ -941,6 +943,9 @@ function renderEditor(){
         <button class="mini-btn" onclick="genMetaDescription()">✨ Auto-generate description from content</button>
         <div style="height:14px"></div>
         ${imageField('Social share image (OG)','seo.ogImage','Ideal size 1200×630 — shown when the site is shared on social or in chats.')}
+        ${textField('Map latitude','seo.latitude','Exact pin — 5+ decimal places (Google requirement). Copy from your Google Business Profile / Google Maps.')}
+        ${textField('Map longitude','seo.longitude','Same source as latitude, e.g. -1.54532.')}
+        ${textField('Property identifier','seo.propertyId','Stable ID for Google (never changes). Defaults to your Hospitable property ID.')}
         <div class="field"><label>AI answer block ("Key Facts & FAQ")</label>
           <label class="switch"><input type="checkbox" ${content.seo.answerBlock?'checked':''} onchange="set('seo.answerBlock', this.checked)"><span class="slider"></span></label>
           <div class="sub">Shows the FAQ section on the site and generates matching FAQ schema — exactly what AI Overviews quote. Questions and categories are managed in the <strong>FAQ / Key Facts</strong> tab.</div></div>
@@ -1705,17 +1710,32 @@ function buildSite(c){
 
   /* SEO head: meta, OG, canonical, JSON-LD */
   const siteUrl = (seo.siteUrl||'').replace(/\/$/,'');
+  const imgs = c.gallery.images.filter(g=>g.src && /^https?:/.test(g.src) && !/floorplan/i.test(g.src));
+  const pickFirst = re => imgs.find(g=>re.test(g.src));
+  const must = [pickFirst(/exterior/), pickFirst(/living-room/), pickFirst(/bedroom/), pickFirst(/shower|ensuite|bath/i), pickFirst(/kitchen/)].filter(Boolean);
+  const ldImages = [...new Set([...must, ...imgs].map(g=>g.src))].slice(0,12);
+  const lat = parseFloat(seo.latitude), lng = parseFloat(seo.longitude);
+  const AF = (name, value) => ({"@type":"LocationFeatureSpecification", name, value});
   const lodging = {
-    "@context":"https://schema.org", "@type":["LodgingBusiness","VacationRental"],
-    "name": B.name, "description": seo.metaDescription || '',
-    "numberOfRooms": 7,
-    "occupancy": {"@type":"QuantitativeValue","maxValue":10,"unitText":"guests"},
-    "geo": {"@type":"GeoCoordinates","latitude":53.9989,"longitude":-1.5453},
-    "tourBookingPage": siteUrl || undefined,
+    "@context":"https://schema.org", "@type":["VacationRental","LodgingBusiness"],
+    "additionalType":"House",
+    "name": B.name, "identifier": seo.propertyId || "portico-suites-franklin-road",
+    "brand": {"@type":"Brand","name": B.name},
+    "description": seo.metaDescription || '',
     "url": siteUrl || undefined, "email": B.email, "telephone": B.phone,
     "address": {"@type":"PostalAddress","streetAddress":"Franklin Road","addressLocality":"Harrogate","addressRegion":"North Yorkshire","postalCode":"HG1 5EN","addressCountry":"GB"},
-    "image": c.gallery.images.filter(g=>g.src && /^https?:/.test(g.src)).slice(0,8).map(g=>g.src),
-    "amenityFeature": c.amenities.items.map(a=>({"@type":"LocationFeatureSpecification","name":a.title,"value":true})),
+    "latitude": isNaN(lat) ? undefined : lat, "longitude": isNaN(lng) ? undefined : lng,
+    "image": ldImages,
+    "checkinTime": "15:00:00", "checkoutTime": "10:00:00",
+    "knowsLanguage": ["en-GB"],
+    "containsPlace": {
+      "@type":"Accommodation", "additionalType":"EntirePlace",
+      "occupancy": {"@type":"QuantitativeValue","value":10},
+      "numberOfBedrooms": 7, "numberOfBathroomsTotal": 5,
+      "floorSize": {"@type":"QuantitativeValue","value":219,"unitCode":"MTK"},
+      "amenityFeature": [AF("wifi",true), AF("internetType","Free"), AF("kitchen",true), AF("ovenStove",true),
+        AF("tv",true), AF("heating",true), AF("selfCheckinCheckout",true), AF("childFriendly",true)]
+    },
     "dateModified": seo.lastUpdated || undefined
   };
   const allFaqItems = faqCats.flatMap(cat => cat.items);
