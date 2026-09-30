@@ -1,5 +1,6 @@
 import json, datetime, os
 BASE='https://porticosuites.com'; IMG=f'{BASE}/images'; TODAY=datetime.date.today().isoformat()
+FAVICON='<link rel="icon" type="image/png" sizes="120x120" href="/favicon.png"><link rel="apple-touch-icon" href="/favicon.png">'
 import pathlib
 ROOT=pathlib.Path(__file__).resolve().parent.parent
 SITE=ROOT/'site'
@@ -26,6 +27,7 @@ def page(pg, all_pages):
 <meta property="og:title" content="{pg['title']}"><meta property="og:description" content="{pg['desc']}">
 <meta property="og:image" content="{IMG}/portico-suites-exterior-franklin-road.jpg">
 <meta property="og:url" content="{BASE}/{pg['slug']}/"><meta property="og:type" content="website">
+{FAVICON}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 <script type="application/ld+json">{json.dumps(faq_ld)}</script>
@@ -476,6 +478,7 @@ def article_page(title,date,cover,excerpt,paras,allposts):
 <link rel="canonical" href="{BASE}/journal/{slug}/">
 <meta property="og:title" content="{title}"><meta property="og:description" content="{excerpt}">
 <meta property="og:image" content="{IMG}/{cover}"><meta property="og:url" content="{BASE}/journal/{slug}/"><meta property="og:type" content="article">
+{FAVICON}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 <script type="application/ld+json">{json.dumps(ld)}</script>
@@ -503,6 +506,7 @@ def journal_index(allposts):
 <title>The Journal \u2014 Notes From Franklin Road | Portico Suites Harrogate</title>
 <meta name="description" content="Guides, local knowledge and seasonal notes from Portico Suites \u2014 a 7-bedroom holiday home in central Harrogate sleeping 10.">
 <link rel="canonical" href="{BASE}/journal/">
+{FAVICON}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 <style>{CSS}
