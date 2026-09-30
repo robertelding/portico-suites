@@ -1,0 +1,3 @@
+{ "name": "portico-site-tools", "private": true,
+  "scripts": { "build": "node build-homepage.js && python3 build-pages.py" },
+  "dependencies": { "jsdom": "^24.0.0" } }
