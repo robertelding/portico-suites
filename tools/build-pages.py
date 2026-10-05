@@ -60,21 +60,12 @@ STD_FAQS=[("How many people can stay?","Up to 10 guests across 7 bedrooms with 5
 ("How close is the Convention Centre?",HCC3),
 ("Why book direct?","Booking directly on porticosuites.com always carries our best rate — no platform fees — with instant confirmation.")]
 
-def event(slug,nav,event_name,season,angle,img,extra_faq=None):
-    return dict(slug=slug,nav=nav,cluster='hcc',
-    title=f"{event_name} Accommodation — 3 Min Walk to HCC | Portico Suites Harrogate",
-    desc=f"Staying for {event_name}? Portico Suites is a 3-minute walk from Harrogate Convention Centre — 7 bedrooms, sleeps 10. House your whole team. Book direct.",
-    eyebrow='Harrogate Convention Centre', h1=f"Accommodation for {event_name}",
-    intro=f"{angle} Portico Suites puts your whole team a 3-minute walk from the halls — 7 private bedrooms, one booking.",
-    hero_img=img, sections=[
-    dict(h2='Three Minutes Door to Door', img=I_EXT, alt=f'House near Harrogate Convention Centre for {event_name}',
-     body=P(f"When {event_name} comes to Harrogate{', '+season if season else ''}, accommodation near the Convention Centre disappears fast. Franklin Road is about three minutes on foot from the HCC entrances — closer than most of the car parks — so setup mornings and breakdown evenings stop being a logistics problem.",
-     "Seven separate bedrooms mean exhibitors, reps and crew each get their own room and en-suite where available; the oak dining table doubles as the stand-planning desk.")+
-     T("3 minutes' walk to HCC","7 private bedrooms · sleeps 10","Fast Wi-Fi &amp; workspace","Full kitchen for show-day starts","One direct booking for the whole team")),
-    ],
-    faqs=[(f"Where can a team stay for {event_name}?",f"Portico Suites on Franklin Road sleeps up to 10 in 7 separate bedrooms, about a 3-minute walk from the Harrogate Convention Centre."),
-    ("Can we book the full show week including build-up days?","Yes — full-week and multi-week bookings around events are welcome. Book early: event weeks sell out well ahead."),
-    ]+([extra_faq] if extra_faq else [])+[STD_FAQS[2]])
+def event(slug,nav,h1,title,desc,intro,hero,sections,faqs):
+    """HCC-cluster event page with fully bespoke copy (no shared template body)."""
+    return dict(slug=slug,nav=nav,cluster='hcc',title=title,desc=desc,eyebrow='Harrogate Convention Centre' if 'hcc' in title.lower() or 'convention' in title.lower() else 'Harrogate Events',
+    h1=h1,intro=intro,hero_img=hero,sections=sections,faqs=faqs)
+DATES="Show dates move from year to year, so check the organiser's website for the current edition before you book."
+
 
 PAGES=[
 # ---- HUBS (6, updated with 3-min) ----
@@ -180,23 +171,140 @@ dict(slug='things-to-do-harrogate',nav='Things To Do',cluster='area',hub=True,
  ("Do I need a car?","Not for the town itself — everything central is walkable from Portico Suites, and trains run direct to York, Leeds and Knaresborough."),
  ("Where can a group stay near all this?","Portico Suites on Franklin Road sleeps up to 10 across 7 bedrooms, a short walk from everything in this guide.")]),
 
-# ---- HCC EVENT PAGES (9) ----
-event('flooring-show-harrogate-accommodation','Flooring Show','The Flooring Show','held each September at the HCC',
- 'The UK flooring trade descends on Harrogate every September.',I_KIT,
- ("Is the house available for build-up and breakdown days?","Yes — book the days you actually need, including pre-show build-up.")),
-event('harrogate-christmas-gift-fair-accommodation','Christmas & Gift Fair','Harrogate Christmas & Gift Fair','each January',
- 'The gifting trade starts its year in Harrogate every January.',I_FIRE,None),
-event('harrogate-bridal-show-accommodation','Bridal Show','the Harrogate Bridal Show','',
- 'When the bridal trade comes to Harrogate, retailers and designers need beds near the halls.',BEDS[2],None),
-event('harrogate-nursery-fair-accommodation','Nursery Fair','Harrogate International Nursery Fair','',
- 'The nursery trade gathers in Harrogate — and accommodation near the HCC goes first.',BEDS[1],None),
-event('home-and-gift-harrogate-accommodation','Home & Gift','Home &amp; Gift Buyers Festival','held each July across Harrogate',
- "July's Home &amp; Gift takes over the whole town — beds nearby become gold dust.",I_SOFA,None),
-event('great-yorkshire-show-accommodation','Great Yorkshire Show','the Great Yorkshire Show','held each July at the Great Yorkshire Showground',
- "England's biggest agricultural show fills every bed in the district each July.",I_GAR,
- ("How far is the Great Yorkshire Showground?","The showground is on the edge of Harrogate — a short drive or taxi from Franklin Road, with central town on your doorstep in the evenings.")),
-event('crime-writing-festival-harrogate-accommodation','Crime Writing Festival','the Theakston Old Peculier Crime Writing Festival','held each July',
- "Each July, crime fiction's biggest festival brings readers and writers to Harrogate.",I_LIV,None),
+# ---- HCC EVENT PAGES (7, each with its own copy) ----
+event('flooring-show-harrogate-accommodation','Flooring Show','Accommodation for The Flooring Show',
+ 'The Flooring Show Harrogate — Group Accommodation Near the HCC | Portico Suites',
+ 'Where to stay for The Flooring Show at Harrogate Convention Centre in September: a 7-bedroom house sleeping 10, 3 minutes from the halls. Book direct.',
+ "September is flooring month in Harrogate. If your brand, distribution team or buying group is exhibiting or visiting, here is a house that keeps everyone together.",I_KIT,[
+ dict(h2='A Trade Show With Long Days',img=I_KIT,alt='Dining kitchen at Portico Suites for flooring show teams',
+  body=P("The Flooring Show brings retail and contract flooring buyers and suppliers to the Harrogate Convention Centre each September, and it has been doing so for a long time. Stands are heavy, samples are bulky and the days run from early set-up to evening customer dinners.",
+  "A house changes how that week works. The kitchen handles early breakfasts, the oak dining table becomes the place to go through the day's leads, and the washer and dryer deal with a week of shirts without a hotel laundry bill.")+
+  T("Full kitchen for early starts","Oak table &amp; benches seat the whole party","Washer &amp; dryer in the house","3 minutes' walk to the HCC")),
+ dict(h2='Sales Team, Stand Crew and Management Together',img=BEDS[0],alt='Principal bedroom with sitting area at Portico Suites',
+  body=P("Seven bedrooms across four floors means the sales director, the account managers and the stand crew each have a door that closes. The principal bedroom has its own sitting area, and four of the five bathrooms are en-suite, so mornings do not become a queue.",
+  "Because the house sleeps up to ten, one booking covers a typical exhibiting team, and you pay for the nights you actually need rather than a hotel block's minimum.")),
+ dict(h2='Build-Up, Show Days and Breakdown',img=I_FIRE,alt='Sitting room with fireplace at Portico Suites',
+  body=P("Self check-in by smart lock means a late-evening arrival after a long drive needs no front-desk handover. Check-in is from 3pm (early check-in from 1pm can be added when you book) and check-out is by 10am, so a breakdown day can start with the house already settled.",
+  "Evenings can be quiet in the sitting room or out in the centre of Harrogate, which is a 7-minute walk away. "+DATES))],
+ [("Is the house available for build-up and breakdown days?","Yes. Book the nights you actually need, including the build-up evening before the show opens."),
+  ("What month is The Flooring Show held?","It is held each September at the Harrogate Convention Centre. Exact dates change each year, so check the organiser's website."),
+  ("Where do vans and cars go?","There is free on-street parking overnight outside the house, and a reserved space can be added during booking where offered."),
+  STD_FAQS[0]]),
+
+event('harrogate-christmas-gift-fair-accommodation','Christmas & Gift Fair','Accommodation for Harrogate Christmas & Gift Fair',
+ 'Harrogate Christmas & Gift Fair — Stay Near the HCC in January | Portico Suites',
+ 'Exhibiting or buying at the Harrogate Christmas & Gift Fair in January? A 7-bedroom townhouse sleeping 10, 3 minutes from the Convention Centre. Book direct.',
+ "January is when the gift and seasonal trade plans its year, and in Harrogate that means a cold walk between the halls and somewhere warm to stay.",I_FIRE,[
+ dict(h2='A Winter Show Needs a Warm Base',img=I_FIRE,alt='Fireplace in the sitting room at Portico Suites',
+  body=P("The Harrogate Christmas &amp; Gift Fair takes place at the Harrogate Convention Centre in January, when retailers and wholesalers come to see what the next season holds.",
+  "After a day on the show floor, the sitting room with its fireplace and the leather sofa is a better place to compare notes than a hotel bar, and the house is a short walk back.")+
+  T("Sitting room with fireplace","3 minutes' walk to the HCC","Fast Wi-Fi for order-writing","Kitchen to cook after a long day")),
+ dict(h2='For Buying Groups and Independent Retailers',img=I_TAB,alt='Dining table at Portico Suites for buying groups',
+  body=P("Buyers often travel as a group: owner, manager and a colleague who knows the stockroom. The house sleeps up to ten in seven separate bedrooms, so a buying group or a few neighbouring shops can share one booking and split the cost.",
+  "The long oak table suits order-writing at the end of the day, with fast Wi-Fi to send it off.")),
+ dict(h2='Exhibitors Setting Up in the Cold',img=BEDS[1],alt='Bedroom at Portico Suites for exhibitors',
+  body=P("Set-up days are long, and tired exhibitors benefit from a proper bed and a hot shower. Four of the five bathrooms are en-suite, and everyone has their own bedroom.",
+  "The town centre is 7 minutes' walk away, with Bettys tea rooms 10 minutes on foot for anyone treating the stand team. "+DATES))],
+ [("When is the Harrogate Christmas & Gift Fair?","It is held at the Harrogate Convention Centre in January. Exact dates change each year, so check the organiser's website."),
+  ("Is the house warm in winter?","Yes. The sitting room has a fireplace, and there is a full kitchen for hot meals after a day on your feet."),
+  ("Can a few retailers share the house?","Yes. One booking covers up to 10 guests across 7 bedrooms, so independent retailers can share and split the cost."),
+  STD_FAQS[2]]),
+
+event('harrogate-bridal-show-accommodation','Bridal Show','Accommodation for Bridal Week Harrogate',
+ 'Bridal Week Harrogate Accommodation — Near the Convention Centre | Portico Suites',
+ 'Stay near Harrogate Convention Centre for Bridal Week, held in March and September. A 7-bedroom house for retailers, designers and teams. Book direct.',
+ "Harrogate's bridal trade event, now staged as Bridal Week, brings retailers and designers twice a year. Here is where a whole team can stay close by.",BEDS[2],[
+ dict(h2='Two Bridal Weeks a Year',img=BEDS[2],alt='Garnet bedroom at Portico Suites',
+  body=P("Bridal Week at the Harrogate Convention Centre runs in spring and autumn, around March and September, bringing bridal retailers and designers together for appointments and orders.",
+  "Both are busy weeks for Harrogate accommodation, so a house that sleeps ten gives a retailer and their team a calm place to stay rather than competing for scattered hotel rooms.")+
+  T("Spring and autumn editions","7 private bedrooms","Quiet sitting room for debriefs","3 minutes' walk to the HCC")),
+ dict(h2='A Calm House Between Appointments',img=I_LIV,alt='Bay-window sitting room at Portico Suites',
+  body=P("Show days for the bridal trade are full of appointments. The bay-window sitting room is somewhere to step back, review notes and decide on orders, and the garden terrace has views of a church spire when the weather allows a coffee outside.",
+  "Each person gets their own bedroom, which matters when a team has been talking to buyers all day.")),
+ dict(h2='Retailers, Designers and Their Teams',img=I_KIT,alt='Dining kitchen at Portico Suites',
+  body=P("A boutique owner might travel with a manager and a stylist; a designer might bring a sales agent. One booking for the whole group is simpler than coordinating several rooms.",
+  "The house is a 7-minute walk to the centre of Harrogate for dinner, and the full kitchen is there if you would rather stay in. "+DATES))],
+ [("When is Bridal Week Harrogate held?","It runs twice a year, in March and September, at the Harrogate Convention Centre. Check the organiser's website for exact dates."),
+  ("Can a boutique team book for just a few nights?","Yes. Book the nights you need around your appointments."),
+  ("Is there space to sit and review orders?","Yes. There is a bay-window sitting room, a dining table that seats the whole party and fast Wi-Fi throughout."),
+  STD_FAQS[0]]),
+
+event('harrogate-nursery-fair-accommodation','Nursery Fair','Accommodation for Harrogate International Nursery Fair',
+ 'Harrogate International Nursery Fair — Where to Stay in October | Portico Suites',
+ 'Attending Harrogate International Nursery Fair in October? A 7-bedroom house sleeping 10, a 3-minute walk from the Convention Centre. Book direct.',
+ "The nursery trade meets in Harrogate every October. If your brand or buying team is going, here is a place to stay together near the halls.",BEDS[1],[
+ dict(h2='An Autumn Fair for Product Launches',img=BEDS[1],alt='Mustard bedroom at Portico Suites',
+  body=P("Harrogate International Nursery Fair moved permanently to October from 2022, a timing its organiser said suits new product launches and retailers planning next year's stock. It is held in the Harrogate Convention Centre, on a single level of halls.",
+  "For brands, that means a few intense days of demonstrations and buyer meetings. The house gives the team a quiet place afterwards.")+
+  T("October fair at the HCC","3 minutes' walk from the house","Kitchen and laundry for a full week","7 bedrooms, sleeps 10")),
+ dict(h2='Showing Products, Not Just Carrying Them',img=I_TAB,alt='Oak dining table at Portico Suites',
+  body=P("Prams, car seats and cots are bulky to carry. Staying three minutes' walk from the halls keeps the back-and-forth manageable, and the large oak table is useful for laying out samples and sorting orders.",
+  "Free overnight on-street parking outside means the van does not need a separate car park booking.")),
+ dict(h2='Retail Buyers and Independent Shops',img=I_SOFA,alt='Leather sofa in the sitting room at Portico Suites',
+  body=P("Buyers from independent nursery shops often travel in small groups. A shared house means you can split the cost, compare the day's finds in the sitting room and still have your own bedroom.",
+  "The centre of Harrogate is 7 minutes' walk for dinner. "+DATES))],
+ [("When is Harrogate International Nursery Fair?","It is held in October at the Harrogate Convention Centre. Check the organiser's website for the exact days."),
+  ("Is the house suitable for bringing samples?","Yes. There is a large dining table for laying out products and free overnight on-street parking."),
+  ("Can the whole team stay in one place?","Yes. Up to 10 guests across 7 bedrooms, with 5 bathrooms, 4 of them en-suite."),
+  STD_FAQS[2]]),
+
+event('home-and-gift-harrogate-accommodation','Home & Gift','Accommodation for Home & Gift Buyers Festival',
+ 'Home & Gift Harrogate — July Buyers Festival Accommodation | Portico Suites',
+ 'Staying for the Home & Gift Buyers Festival in Harrogate each July? A 7-bedroom townhouse sleeping 10, 3 minutes from the Convention Centre. Book direct.',
+ "Each July the home, gift and interiors trade fills Harrogate. A house for the whole team beats hunting for rooms.",I_SOFA,[
+ dict(h2='A Summer Buying Festival',img=I_GAR,alt='Garden terrace at Portico Suites',
+  body=P("Home &amp; Gift is a summer buying festival for retailers in homeware, gifts and interiors, centred on the Harrogate Convention Centre in July.",
+  "Portico Suites keeps a team within a 3-minute walk, and in July the garden terrace, with views of a church spire, is a pleasant place for an evening drink after the halls close.")+
+  T("Garden terrace for summer evenings","3 minutes' walk to the HCC","Full kitchen &amp; laundry","Self check-in by smart lock")),
+ dict(h2='Buyers Who Like to Plan',img=I_TAB,alt='Dining table at Portico Suites',
+  body=P("A show for buyers rewards preparation. The dining table seats the whole party, so a team can map out which stands to visit, and the fast Wi-Fi makes placing orders from the house simple.",
+  "Seven bedrooms mean everyone has their own space, and the house sleeps up to ten, so a retailer can bring colleagues, a partner or a friend for the trip.")),
+ dict(h2='Harrogate After the Show',img=I_EXT,alt='Portico Suites exterior on Franklin Road',
+  body=P("From Franklin Road, the town centre is 7 minutes' walk, Bettys is 10 and the Valley Gardens are 10, so there is plenty to see in the evening. For a group staying several nights, that variety is a welcome change from show-floor food.",
+  DATES))],
+ [("When is the Home & Gift Buyers Festival?","It is held each July, centred on the Harrogate Convention Centre. Check the organiser's website for the exact days."),
+  ("Is there outdoor space?","Yes. The garden terrace has quiet seating and views of a church spire."),
+  ("Is parking included?","There is free on-street parking overnight, and a reserved space can be added during booking where offered."),
+  STD_FAQS[0]]),
+
+event('great-yorkshire-show-accommodation','Great Yorkshire Show','Accommodation for the Great Yorkshire Show',
+ 'Great Yorkshire Show Accommodation — Large House in Central Harrogate | Portico Suites',
+ 'Looking for a place to stay for the Great Yorkshire Show in July? A 7-bedroom Harrogate townhouse sleeping 10, a short drive from the showground. Book direct.',
+ "Four days in July bring crowds of farmers, families and exhibitors to Harrogate. A house for a group is the easy way to stay together.",I_GAR,[
+ dict(h2='A Big Show on the Edge of Town',img=I_GAR,alt='Garden terrace at Portico Suites',
+  body=P("The Great Yorkshire Show is held over four days each July at the Great Yorkshire Showground on Railway Road, Harrogate. In 2026 it ran 14 to 17 July.",
+  "The showground is on the edge of town, a short drive or taxi from Franklin Road, which makes a base in central Harrogate a good compromise: restaurants and the Stray are close by in the evening.")+
+  T("Short drive or taxi to the showground","Central Harrogate base","Garden terrace for summer evenings","Free on-street parking overnight")),
+ dict(h2='Families, Exhibitors and Friends Together',img=I_LIV,alt='Sitting room at Portico Suites',
+  body=P("A show attracts mixed groups: a farming family, a stand team, friends who go every year. Seven bedrooms and a large dining table mean everyone has a place, and four of the five bathrooms are en-suite.",
+  "After a long day on your feet, the sitting room is a place to rest, and the kitchen is there for a proper breakfast before an early start.")),
+ dict(h2='Dogs, Early Starts and Late Evenings',img=I_KIT,alt='Dining kitchen at Portico Suites',
+  body=P("Well-behaved dogs are welcome, which suits families who bring theirs. Self check-in by smart lock means a late arrival after a day at the show is straightforward.",
+  "Check-in is from 3pm and check-out by 10am. "+DATES))],
+ [("How far is the Great Yorkshire Showground?","The showground is on the edge of Harrogate, a short drive or taxi from Franklin Road, with central town on your doorstep in the evenings."),
+  ("When is the Great Yorkshire Show?","It is held for four days in mid-July. The 2026 show ran 14 to 17 July."),
+  ("Can we bring a dog?","Yes. Well-behaved dogs are welcome."),
+  STD_FAQS[0]]),
+
+event('crime-writing-festival-harrogate-accommodation','Crime Writing Festival','Accommodation for the Theakston Old Peculier Crime Writing Festival',
+ 'Crime Writing Festival Harrogate — Group Accommodation in Town | Portico Suites',
+ 'Staying for the Theakston Old Peculier Crime Writing Festival at the Old Swan Hotel? A 7-bedroom Harrogate townhouse sleeping 10. Book direct.',
+ "Every July, readers and writers gather in Harrogate for a long weekend of crime fiction. A house is a good base for a group of friends who read together.",I_LIV,[
+ dict(h2='Four Days Based Around the Old Swan',img=I_LIV,alt='Sitting room at Portico Suites',
+  body=P("The Theakston Old Peculier Crime Writing Festival is held each July in Harrogate. The 2026 festival ran 23 to 26 July at the Old Swan Hotel and drew a programme of well over a hundred crime and thriller writers.",
+  "The festival is based at the Old Swan Hotel in central Harrogate rather than at the Convention Centre, so staying in town suits it well. The centre of Harrogate is 7 minutes' walk from Franklin Road.")+
+  T("Central Harrogate base","7 bedrooms, sleeps 10","Sitting room for post-panel debates","Kitchen for slow mornings")),
+ dict(h2='A Group of Readers Under One Roof',img=I_SOFA,alt='Leather sofa at Portico Suites',
+  body=P("Festival-goers often book as a group of friends. A house gives each person their own bedroom while keeping everyone together in the evening, when the real conversation about who did it begins.",
+  "The sitting room and its fireplace are suited to that, and the dining table seats the whole group for breakfast.")),
+ dict(h2='Harrogate Between Events',img=I_EXT,alt='Portico Suites exterior on Franklin Road',
+  body=P("Between sessions there is plenty to do: Bettys tea rooms are 10 minutes' walk, the Valley Gardens 10 minutes and the Stray close by. July is a busy month in Harrogate, so it is worth booking early.",
+  DATES))],
+ [("Where is the Crime Writing Festival held?","It is based at the Old Swan Hotel in central Harrogate, not at the Convention Centre."),
+  ("When is the festival?","It is held each July. The 2026 festival ran 23 to 26 July."),
+  ("How many can stay?","Up to 10 guests across 7 bedrooms with 5 bathrooms, 4 of them en-suite."),
+  STD_FAQS[2]]),
+
 dict(slug='exhibitor-accommodation-harrogate',nav='Exhibitor Stays',cluster='hcc',
  title='Exhibitor Accommodation in Harrogate — 3 Min to HCC | Portico Suites',
  desc='Exhibitor accommodation 3 minutes from Harrogate Convention Centre: 7 bedrooms, sleeps 10, full kitchen and workspace. One booking for the whole stand team.',
