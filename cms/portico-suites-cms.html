@@ -1744,6 +1744,11 @@ function buildSite(c){
       "@type":"Accommodation", "additionalType":"EntirePlace",
       "occupancy": {"@type":"QuantitativeValue","value":10},
       "numberOfBedrooms": 7, "numberOfBathroomsTotal": 5,
+      "bed": [
+        {"@type":"BedDetails","numberOfBeds":6,"typeOfBed":"Large double bed"},
+        {"@type":"BedDetails","numberOfBeds":1,"typeOfBed":"Double sofa bed"},
+        {"@type":"BedDetails","numberOfBeds":2,"typeOfBed":"Sofa bed (extra, configured as required)"}
+      ],
       "floorSize": {"@type":"QuantitativeValue","value":219,"unitCode":"MTK"},
       "amenityFeature": [AF("wifi",true), AF("internetType","Free"), AF("kitchen",true), AF("ovenStove",true),
         AF("tv",true), AF("heating",true), AF("selfCheckinCheckout",true), AF("childFriendly",true)]
