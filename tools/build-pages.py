@@ -253,7 +253,7 @@ event('home-and-gift-harrogate-accommodation','Home & Gift','Accommodation for H
  'Staying for the Home & Gift Buyers Festival in Harrogate each July? A 7-bedroom townhouse sleeping 10, 3 minutes from the Convention Centre. Book direct.',
  "Each July the home, gift and interiors trade fills Harrogate. A house for the whole team beats hunting for rooms.",I_SOFA,[
  dict(h2='A Summer Buying Festival',img=I_GAR,alt='Garden terrace at Portico Suites',
-  body=P("Home &amp; Gift is a summer buying festival for retailers in homeware, gifts and interiors, centred on the Harrogate Convention Centre in July.",
+  body=P("Home &amp; Gift is a summer buying festival for retailers in homeware, gifts and interiors, centred on the Harrogate Convention Centre in July. The 2026 festival ran 19 to 22 July, and the next is 18 to 21 July 2027.",
   "Portico Suites keeps a team within a 3-minute walk, and in July the garden terrace, with views of a church spire, is a pleasant place for an evening drink after the halls close.")+
   T("Garden terrace for summer evenings","3 minutes' walk to the HCC","Full kitchen &amp; laundry","Self check-in by smart lock")),
  dict(h2='Buyers Who Like to Plan',img=I_TAB,alt='Dining table at Portico Suites',
@@ -262,7 +262,7 @@ event('home-and-gift-harrogate-accommodation','Home & Gift','Accommodation for H
  dict(h2='Harrogate After the Show',img=I_EXT,alt='Portico Suites exterior on Franklin Road',
   body=P("From Franklin Road, the town centre is 7 minutes' walk, Bettys is 10 and the Valley Gardens are 10, so there is plenty to see in the evening. For a group staying several nights, that variety is a welcome change from show-floor food.",
   DATES))],
- [("When is the Home & Gift Buyers Festival?","It is held each July, centred on the Harrogate Convention Centre. Check the organiser's website for the exact days."),
+ [("When is the Home & Gift Buyers Festival?","It is held each July, centred on the Harrogate Convention Centre. The 2026 festival ran 19 to 22 July, and the next runs 18 to 21 July 2027."),
   ("Is there outdoor space?","Yes. The garden terrace has quiet seating and views of a church spire."),
   ("Is parking included?","There is free on-street parking overnight, and a reserved space can be added during booking where offered."),
   STD_FAQS[0]]),
@@ -292,15 +292,15 @@ event('crime-writing-festival-harrogate-accommodation','Crime Writing Festival',
  "Every July, readers and writers gather in Harrogate for a long weekend of crime fiction. A house is a good base for a group of friends who read together.",I_LIV,[
  dict(h2='Four Days Based Around the Old Swan',img=I_LIV,alt='Sitting room at Portico Suites',
   body=P("The Theakston Old Peculier Crime Writing Festival is held each July in Harrogate. The 2026 festival ran 23 to 26 July at the Old Swan Hotel and drew a programme of well over a hundred crime and thriller writers.",
-  "The festival is based at the Old Swan Hotel in central Harrogate rather than at the Convention Centre, so staying in town suits it well. The centre of Harrogate is 7 minutes' walk from Franklin Road.")+
-  T("Central Harrogate base","7 bedrooms, sleeps 10","Sitting room for post-panel debates","Kitchen for slow mornings")),
+  "The festival is based at the Old Swan Hotel in central Harrogate rather than at the Convention Centre, so staying in town suits it well. The Old Swan is an 8-minute walk from Franklin Road.")+
+  T("8 minutes' walk to the Old Swan","7 bedrooms, sleeps 10","Sitting room for post-panel debates","Kitchen for slow mornings")),
  dict(h2='A Group of Readers Under One Roof',img=I_SOFA,alt='Leather sofa at Portico Suites',
   body=P("Festival-goers often book as a group of friends. A house gives each person their own bedroom while keeping everyone together in the evening, when the real conversation about who did it begins.",
   "The sitting room and its fireplace are suited to that, and the dining table seats the whole group for breakfast.")),
  dict(h2='Harrogate Between Events',img=I_EXT,alt='Portico Suites exterior on Franklin Road',
   body=P("Between sessions there is plenty to do: Bettys tea rooms are 10 minutes' walk, the Valley Gardens 10 minutes and the Stray close by. July is a busy month in Harrogate, so it is worth booking early.",
   DATES))],
- [("Where is the Crime Writing Festival held?","It is based at the Old Swan Hotel in central Harrogate, not at the Convention Centre."),
+ [("Where is the Crime Writing Festival held?","It is based at the Old Swan Hotel in central Harrogate, not at the Convention Centre. The Old Swan is an 8-minute walk from Portico Suites."),
   ("When is the festival?","It is held each July. The 2026 festival ran 23 to 26 July."),
   ("How many can stay?","Up to 10 guests across 7 bedrooms with 5 bathrooms, 4 of them en-suite."),
   STD_FAQS[2]]),
