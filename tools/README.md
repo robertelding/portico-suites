@@ -22,3 +22,6 @@ Setup once: `cd tools && npm install` (installs jsdom).
 - Never commit `.env` or any secret. Secrets live in Render's Environment settings only.
 - Keep "Portico Suites" as the property name everywhere (it must match Hospitable Direct / Google).
 - Reviews must be quoted verbatim and be real.
+
+## Site-wide guide directory
+Every landing page and Journal page ends with an "All Portico Suites Guides" block generated from `PAGES` in `tools/build-pages.py` (grouped by `cluster`). The homepage footer shows the same list from `guideDirectory` in the CMS defaults. When you add a landing page, rebuild with `build-pages.py`, then add it to `guideDirectory` in `cms/portico-suites-cms.html` and run `build-homepage.js`, so no page is left without internal links.

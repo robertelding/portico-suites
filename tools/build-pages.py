@@ -9,6 +9,17 @@ P=lambda *ps:"".join(f"<p>{x}</p>" for x in ps)
 T=lambda *i:"<ul class='ticks'>"+"".join(f"<li>{x}</li>" for x in i)+"</ul>"
 USP="Sleeps 10 · 7 bedrooms · 5 bathrooms · 3 minutes' walk to Harrogate Convention Centre · central Franklin Road"
 
+
+GUIDE_GROUPS=[('hcc','Convention Centre & Events'),('family','Groups, Families & Breaks'),('corporate','Corporate & Contractors'),('area','Harrogate Area Guides')]
+def guides_block(current=None):
+    """Site-wide directory linking every landing page, so no page is orphaned."""
+    out=[]
+    for cl,label in GUIDE_GROUPS:
+        links="".join(f"<a href='/{o['slug']}/'>{o['nav']}</a>" for o in PAGES if o['cluster']==cl and o['slug']!=current)
+        out.append(f"<div class='gg'><div class='eyebrow'>{label}</div><div class='linkrow'>{links}</div></div>")
+    return ("<section class='guides'><div class='wrap'><div class='eyebrow'>Explore</div><h2>All Portico Suites Guides</h2><div class='rule'></div>"
+            +"".join(out)+"<div class='linkrow'><a href='/journal/'>The Journal</a><a href='/'>Portico Suites home</a></div></div></section>")
+
 def page(pg, all_pages):
     sibs=[o for o in all_pages if o['cluster']==pg['cluster'] and o['slug']!=pg['slug']][:4]
     hubs=[o for o in all_pages if o.get('hub') and o['slug']!=pg['slug']][:3]
@@ -41,6 +52,7 @@ def page(pg, all_pages):
 <section style="padding-top:0"><div class="wrap faq"><div class="eyebrow">Quick Answers</div><h2>Frequently Asked</h2><div class="rule"></div><dl>{faqs}</dl></div></section>
 <div class="band" id="availability"><h2>{USP.split(' · ')[0]} · {USP.split(' · ')[1]}</h2><p>{USP}. Book directly for the guaranteed best rate — no platform fees, instant confirmation.</p><a class="cta gold" href="/#book">Check Availability</a></div>
 <section><div class="wrap"><div class="eyebrow">Related Guides</div><div class="linkrow">{links}<a href="/">← Portico Suites home</a></div></div></section>
+{guides_block(pg['slug'])}
 <footer>PORTICO SUITES · Franklin Road, Harrogate HG1 5EN · <a href="/">porticosuites.com</a> · <a href="/#book">Book Direct</a></footer>
 </body></html>"""
 
@@ -649,6 +661,7 @@ def article_page(title,date,cover,excerpt,paras,allposts):
 <img class="cover" src="{IMG}/{cover}" alt="{title}">{body}</article>
 <div class="band"><h2>Sleeps 10 \u00b7 7 Bedrooms \u00b7 Central Harrogate</h2><p>{USP}. Book directly for the guaranteed best rate.</p><a class="cta gold" href="/#book">Check Availability</a></div>
 <section><div class="wrap"><div class="eyebrow">Keep Reading</div><div class="linkrow">{olinks}<a href="/journal/">All Journal posts</a></div></div></section>
+{guides_block()}
 <footer>PORTICO SUITES \u00b7 Franklin Road, Harrogate HG1 5EN \u00b7 <a href="/">porticosuites.com</a> \u00b7 <a href="/#book">Book Direct</a></footer>
 </body></html>"""
 
@@ -677,6 +690,7 @@ def journal_index(allposts):
 <p style="max-width:560px;margin:0 auto">Guides, local knowledge and seasonal notes from the house.</p></div>
 <div class="jgrid">{cards}</div></div></section>
 <div class="band"><h2>Sleeps 10 \u00b7 7 Bedrooms \u00b7 Central Harrogate</h2><p>{USP}. Book directly for the guaranteed best rate.</p><a class="cta gold" href="/#book">Check Availability</a></div>
+{guides_block()}
 <footer>PORTICO SUITES \u00b7 Franklin Road, Harrogate HG1 5EN \u00b7 <a href="/">porticosuites.com</a> \u00b7 <a href="/#book">Book Direct</a></footer>
 </body></html>"""
 

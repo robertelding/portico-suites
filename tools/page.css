@@ -34,3 +34,7 @@ ul.ticks li:before{content:'✦';color:var(--gold);position:absolute;left:0}
 footer{background:var(--olived);color:var(--ivory);text-align:center;padding:34px 24px;font-size:12px;letter-spacing:.06em}
 footer a{color:var(--gold);text-decoration:none}
 @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+
+.guides{padding:56px 0;border-top:1px solid var(--ivory2)}
+.guides .gg{margin-top:22px}
+.guides .eyebrow{margin-bottom:6px}
