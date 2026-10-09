@@ -119,12 +119,12 @@ dict(slug='group-accommodation-harrogate',nav='Group Accommodation',cluster='fam
  title='Large Group Accommodation in Harrogate — 7-Bed House Sleeps 10 | Portico Suites',
  desc='Large group accommodation in central Harrogate: a 7-bedroom Victorian townhouse sleeping up to 10, with 5 bathrooms, a full kitchen and self check-in. Book direct.',
  eyebrow='Groups of up to 10', h1='Large Group Accommodation in Harrogate',
- intro='Portico Suites is a 7-bedroom Victorian townhouse on Franklin Road in central Harrogate. It sleeps up to 10 guests across 219 m² and four floors, so a large group can stay together in one house instead of several hotel rooms.',
+ intro='Portico Suites is a 7-bedroom Victorian townhouse on Franklin Road in central Harrogate. It sleeps up to 10 guests across 219 m² and three floors, so a large group can stay together in one house instead of several hotel rooms.',
  hero_img=I_LIV, sections=[
  dict(h2='Room for Everyone', img=I_FLR, alt='Floorplan of 7-bedroom large group accommodation in Harrogate',
-  body=P("This is large accommodation in Harrogate for groups who want to stay together: seven bedrooms over four floors means couples, friends and colleagues each get real privacy, and with five bathrooms (four en-suite) mornings never queue.",
+  body=P("This is large accommodation in Harrogate for groups who want to stay together: seven bedrooms over three floors means couples, friends and colleagues each get real privacy, and with five bathrooms (four en-suite) mornings never queue.",
   "The sitting room gathers everyone around the fireplace and bay window, and the dining kitchen seats the full party at one oak table.")+
-  T("7 bedrooms · sleeps up to 10","5 bathrooms, 4 en-suite","219 m² over four floors","Sitting room + dining kitchen for the whole group")),
+  T("7 bedrooms · sleeps up to 10","5 bathrooms, 4 en-suite","219 m² over three floors","Sitting room + dining kitchen for the whole group")),
  dict(h2='How the Beds Are Arranged', img=BEDS[0], alt='Principal bedroom with large double bed at Portico Suites',
   body=P("Six of the bedrooms each have one large double bed. The seventh bedroom has a double sofa bed. Two further sofa beds can be set up as alternatives where a group needs a different arrangement.",
   "The house sleeps a maximum of 10 guests. That limit is set by fire regulations and applies however the beds are arranged.")),
