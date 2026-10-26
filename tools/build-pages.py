@@ -33,6 +33,7 @@ def page(pg, all_pages):
     links="".join(f"<a href='/{o['slug']}/'>{o['nav']}</a>" for o in others)
     return f"""<!DOCTYPE html><html lang="en-GB"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google-site-verification" content="mYreUjwsZqtRcN-7vxOHTy6zzAWRGdZWIwnM0hXcVFU">
 <title>{pg['title']}</title><meta name="description" content="{pg['desc']}">
 <link rel="canonical" href="{BASE}/{pg['slug']}/">
 <meta property="og:title" content="{pg['title']}"><meta property="og:description" content="{pg['desc']}">
@@ -638,6 +639,7 @@ def article_page(title,date,cover,excerpt,paras,allposts):
     body="".join(f"<p>{x}</p>" for x in paras)
     return f"""<!DOCTYPE html><html lang="en-GB"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google-site-verification" content="mYreUjwsZqtRcN-7vxOHTy6zzAWRGdZWIwnM0hXcVFU">
 <title>{title} | The Journal | Portico Suites Harrogate</title>
 <meta name="description" content="{excerpt}">
 <link rel="canonical" href="{BASE}/journal/{slug}/">
@@ -669,6 +671,7 @@ def journal_index(allposts):
     cards="".join(f"""<a class="jcard" href="/journal/{_slug(t)}/"><img src="{IMG}/{c}" alt="{t}" loading="lazy"><div class="jbody"><time>{d}</time><h3>{t}</h3><p>{e}</p></div></a>""" for (t,d,c,e,_) in allposts)
     return f"""<!DOCTYPE html><html lang="en-GB"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google-site-verification" content="mYreUjwsZqtRcN-7vxOHTy6zzAWRGdZWIwnM0hXcVFU">
 <title>The Journal \u2014 Notes From Franklin Road | Portico Suites Harrogate</title>
 <meta name="description" content="Guides, local knowledge and seasonal notes from Portico Suites \u2014 a 7-bedroom holiday home in central Harrogate sleeping 10.">
 <link rel="canonical" href="{BASE}/journal/">
