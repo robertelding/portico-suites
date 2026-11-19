@@ -291,7 +291,7 @@ const DEFAULT_CONTENT = {
     intro:'Clear terms are required for payment processing.',
     tabs:[
       {title:'Cancellation', items:['Free cancellation up to 30 days before arrival — full refund.','Cancel 14–30 days before arrival — 50% refund (cleaning fee fully refunded).','Within 14 days of arrival — non-refundable.']},
-      {title:'Terms of Service', items:['Arrival from 3:00 PM · Departure by 10:00 AM.','Maximum occupancy as booked; no parties or events.','No smoking inside the property.','Guests are responsible for damage beyond normal wear and tear.']},
+      {title:'Terms of Service', items:['Arrival from 4:00 PM · Departure by 10:00 AM.','Maximum occupancy as booked; no parties or events.','No smoking inside the property.','Guests are responsible for damage beyond normal wear and tear.']},
       {title:'Privacy Policy', items:['Booking details are collected solely to process your reservation.','Payments are processed by Stripe/PayPal — card details are never stored on this site.','We do not sell or share guest data with third parties.']}
     ]
   },
@@ -393,7 +393,7 @@ const DEFAULT_CONTENT = {
         {q:'Is Portico Suites a holiday rental?', a:'Yes — Portico Suites is a self-catering holiday home (holiday let) in central Harrogate, available for short breaks, group stays and longer visits, booked directly on this website.'},
         {q:'Where can a group of 10 stay in Harrogate?', a:'Portico Suites sleeps up to 10 guests across 7 bedrooms with 5 bathrooms, making it one of the largest holiday homes in central Harrogate for families and groups.'},
         {q:'How many guests can stay?', a:'The house sleeps up to 10 guests across 7 bedrooms set over three floors, with 5 bathrooms — 4 of them en-suite.'},
-        {q:'What are check-in and check-out times?', a:'Check-in from 3:00 PM with self check-in via smart lock; check-out by 10:00 AM. Early check-in from 1:00 PM can be added during booking.'}
+        {q:'What are check-in and check-out times?', a:'Check-in from 4:00 PM with self check-in via smart lock; check-out by 10:00 AM. Early check-in from 1:00 PM can be added during booking.'}
       ]},
       {name:'Booking & Payment', items:[
         {q:'How do I get the best rate?', a:'Book direct on this website — direct bookings carry no platform fees and beat Airbnb and Vrbo pricing for the same dates.'},
@@ -1322,7 +1322,7 @@ const EMAIL_DEFAULTS = {
   announce:{subject:'News from Portico Suites', preheader:'A quick update from Franklin Road', heading:'A Note From Franklin Road', body:'We have some news to share with you from the house.\n\nWrite your announcement here.', cta:'Read More', ctaUrl:'https://porticosuites.com', extra:''},
   photohero:{subject:'The Portico Journal', preheader:'Notes, dates and Harrogate finds', heading:'Notes From The House', body:'Our latest stories and what\'s coming up this season.\n\nSecond paragraph here.', cta:'Visit The Journal', ctaUrl:'https://porticosuites.com', extra:''},
   offer:{subject:'A private offer for you', preheader:'Direct-booking guests only', heading:'10% Off Your Next Stay', body:'As a thank you for booking direct, enjoy 10% off any stay this season.', cta:'Book With Code', ctaUrl:'https://porticosuites.com', extra:'PORTICO10\nValid until the end of next month · Direct bookings only'},
-  confirm:{subject:'Your booking is confirmed', preheader:'Everything you need for your stay', heading:'You\'re Booked In', body:'Thank you for booking direct with Portico Suites. Your stay details are below — we\'ll send arrival instructions closer to the time.', cta:'View Your Booking', ctaUrl:'https://porticosuites.com', extra:'Check-in: [date] from 3:00 PM\nCheck-out: [date] by 10:00 AM\nGuests: [number]\nAddress: Franklin Road, Harrogate HG1 5EN'},
+  confirm:{subject:'Your booking is confirmed', preheader:'Everything you need for your stay', heading:'You\'re Booked In', body:'Thank you for booking direct with Portico Suites. Your stay details are below — we\'ll send arrival instructions closer to the time.', cta:'View Your Booking', ctaUrl:'https://porticosuites.com', extra:'Check-in: [date] from 4:00 PM\nCheck-out: [date] by 10:00 AM\nGuests: [number]\nAddress: Franklin Road, Harrogate HG1 5EN'},
   seasonal:{subject:'Season\'s greetings from Portico Suites', preheader:'Warm wishes from Harrogate', heading:'Warm Wishes From Franklin Road', body:'From all of us at the house, thank you for being part of our year. We hope to welcome you back soon.', cta:'See Winter Dates', ctaUrl:'https://porticosuites.com', extra:''},
   lastmin:{subject:'Open dates at Portico Suites', preheader:'A few nights have just opened up', heading:'Just Released: Open Dates', body:'A cancellation has opened up some rare availability. Direct bookers see it first:', cta:'Check Availability', ctaUrl:'https://porticosuites.com', extra:'Fri 14 – Sun 16 Aug · 2 nights\nMon 24 – Fri 28 Aug · 4 nights\nSat 5 – Sat 12 Sep · full week'},
   guide:{subject:'Our Harrogate shortlist', preheader:'Three things not to miss', heading:'Three Things To Do This Month', body:'Our current favourites, all within a short walk of the front door.', cta:'Plan Your Stay', ctaUrl:'https://porticosuites.com', extra:'Bettys Café Tea Rooms — the queue moves faster before 9am, and the fat rascals are worth it.\nValley Gardens — 17 acres of Victorian gardens; enter via the Pump Room for the prettiest route.\nTurkish Baths — book the evening session in the Grade II listed baths, five minutes away.'},
@@ -1915,7 +1915,7 @@ nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb, var(--ivory) 
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle}
 .sync-badges{display:flex;gap:14px;justify-content:center;margin-top:32px;flex-wrap:wrap}
 .sync-badge{border:1px solid color-mix(in srgb, var(--gold) 50%, transparent);color:var(--gold);border-radius:var(--radius);padding:9px 20px;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
-.checkout-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:36px;max-width:520px;margin:48px auto 0;box-shadow:0 14px 40px rgba(40,50,36,.1);position:relative}
+.checkout-card{background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);padding:36px;max-width:520px;margin:48px auto 0;box-shadow:0 14px 40px rgba(40,50,36,.1);position:relative}
 .checkout-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bronze),var(--gold),var(--bronze))}
 .checkout-card .row{display:flex;justify-content:space-between;font-size:14px;font-weight:300;padding:12px 0;border-bottom:1px solid var(--ivory-deep)}
 .checkout-card .row.total{font-weight:600;font-size:16px;border-bottom:none;color:var(--olive)}
