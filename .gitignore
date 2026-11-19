@@ -13,3 +13,6 @@ Thumbs.db
 
 # Build artefacts & archives (source lives in folders, not zips)
 *.zip
+
+# Rendered promo videos (too large for git)
+marketing/video/*.mp4
