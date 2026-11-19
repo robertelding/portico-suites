@@ -150,7 +150,7 @@
 
   function guest() {
     const g = { firstName: v('bw-fn'), lastName: v('bw-ln'), email: v('bw-em'), phone: v('bw-ph') };
-    if (!g.firstName || !g.email || !g.phone) { msg('Please complete name, email and mobile number.'); return null; }
+    if (!g.firstName || !g.lastName || !g.email || !g.phone) { msg('Please complete first name, last name, email and mobile number.'); return null; }
     return g;
   }
   const v = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };

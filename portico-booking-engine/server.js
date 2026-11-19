@@ -12,7 +12,7 @@ require('dotenv').config();
 const express = require('express');
 const crypto = require('crypto');
 const Stripe = require('stripe');
-const { getProperty, getCalendar, createReservation, flagReservation } = require('./lib/hospitable');
+const { getProperty, getCalendar, createReservation, setReservationNote } = require('./lib/hospitable');
 const { verifyVoucher } = require('./lib/vouchers');
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
@@ -81,8 +81,8 @@ app.get('/api/property', async (req, res) => {
       name: p.name || p.public_name,
       maxOccupancy: p.capacity?.max ?? p.max_occupancy,
       amenities: p.amenities,
-      checkIn: p.check_in || '15:00',
-      checkOut: p.check_out || '10:00'
+      checkIn: p.checkin || p.check_in || '16:00',
+      checkOut: p.checkout || p.check_out || '10:00'
     });
   } catch (e) { res.status(502).json({ error: 'Property lookup failed' }); console.error(e); }
 });
@@ -100,17 +100,30 @@ app.get('/api/calendar', async (req, res) => {
 /* ── 3. Quote: server-side pricing with live breakdown ──────────────── */
 const ADDONS = { parking: { label: 'Private parking', amount: 0 },
                  early_checkin: { label: 'Early check-in (1:00 PM)', amount: 25 } };
+const MAX_GUESTS = 10;
 const CLEANING_FEE = 60;      // move to env/Hospitable fees once confirmed
 const TAX_PCT = 0;            // UK: set if registered / local taxes apply
 
 app.post('/api/quote', async (req, res) => {
   try {
-    const { checkIn, checkOut, guests = 2, addons = [], voucherCode } = req.body;
+    const { checkIn, checkOut, addons = [], voucherCode } = req.body;
+    const guests = Math.min(MAX_GUESTS, Math.max(1, parseInt(req.body.guests, 10) || 2));
+    const isDate = (v) => /^\d{4}-\d{2}-\d{2}$/.test(v || '');
+    if (!isDate(checkIn) || !isDate(checkOut) || checkOut <= checkIn)
+      return res.status(400).json({ error: 'Invalid date range' });
     const days = await getCalendar(PROPERTY_ID, checkIn, checkOut);
     const nights = days.filter(d => d.date >= checkIn && d.date < checkOut);
     if (!nights.length) return res.status(400).json({ error: 'Invalid date range' });
     if (nights.some(d => !d.available))
       return res.status(409).json({ error: 'One or more selected nights are no longer available' });
+    // Stay rules set in Hospitable: minimum stay and arrival/departure-day restrictions.
+    const minStay = nights[0].minStay || 1;
+    if (nights.length < minStay)
+      return res.status(400).json({ error: `Minimum stay for those dates is ${minStay} nights` });
+    if (nights[0].closedForCheckin)
+      return res.status(400).json({ error: 'Arrivals are not available on that date — please choose another arrival day' });
+    if (days.find(d => d.date === checkOut)?.closedForCheckout)
+      return res.status(400).json({ error: 'Departures are not available on that date — please choose another departure day' });
 
     const subtotal = nights.reduce((s, d) => s + d.price, 0);
     const addonItems = addons.filter(a => ADDONS[a]).map(a => ({ code: a, ...ADDONS[a] }));
@@ -141,7 +154,7 @@ const clip = (v, n) => String(v || '').trim().slice(0, n);
 function cleanGuest(g) {
   const guest = { firstName: clip(g?.firstName, 100), lastName: clip(g?.lastName, 100),
                   email: clip(g?.email, 200), phone: clip(g?.phone, 40) };
-  return guest.firstName && guest.email && guest.phone ? guest : null;
+  return guest.firstName && guest.lastName && guest.email && guest.phone ? guest : null;
 }
 
 app.post('/api/payments/intent', async (req, res) => {
@@ -151,7 +164,7 @@ app.post('/api/payments/intent', async (req, res) => {
     if (!q) return res.status(410).json({ error: 'Quote expired — please reprice' });
     if (q.total <= 0) return res.json({ free: true });   // 100% voucher — no payment needed
     const guest = cleanGuest(req.body.guest);
-    if (!guest) return res.status(400).json({ error: 'Guest name, email and phone are required' });
+    if (!guest) return res.status(400).json({ error: 'Guest first name, last name, email and phone are required' });
 
     // Re-check live availability immediately before taking payment.
     const days = await getCalendar(PROPERTY_ID, q.checkIn, q.checkOut);
@@ -177,6 +190,7 @@ app.post('/api/payments/intent', async (req, res) => {
         source: BOOKING_SOURCE, quoteId,
         checkIn: q.checkIn, checkOut: q.checkOut, guests: String(q.guests),
         addons: (q.addons || []).join(','), total: String(q.total),
+        cleaningFee: String(q.cleaningFee), addonItems: JSON.stringify(q.addonItems || []).slice(0, 500),
         voucher: q.voucher ? q.voucher.code : '',
         guestFirstName: guest.firstName, guestLastName: guest.lastName,
         guestEmail: guest.email, guestPhone: guest.phone
@@ -197,6 +211,7 @@ function fulfilPaymentIntent(intentId) {
     fulfilling.set(intentId, doFulfil(intentId).finally(() => fulfilling.delete(intentId)));
   return fulfilling.get(intentId);
 }
+const parseJSON = (s, fallback) => { try { return JSON.parse(s); } catch { return fallback; } };
 async function doFulfil(intentId) {
   const intent = await stripe.paymentIntents.retrieve(intentId);
   const m = intent.metadata || {};
@@ -209,7 +224,9 @@ async function doFulfil(intentId) {
     guest: { firstName: m.guestFirstName, lastName: m.guestLastName, email: m.guestEmail, phone: m.guestPhone },
     checkIn: m.checkIn, checkOut: m.checkOut, guests: Number(m.guests) || 1,
     addons: m.addons ? m.addons.split(',') : [],
-    paymentIntentId: intentId, totals: { total: Number(m.total) }
+    paymentIntentId: intentId, currency: intent.currency,
+    totals: { total: Number(m.total), cleaningFee: Number(m.cleaningFee) || 0,
+              addonItems: parseJSON(m.addonItems, []), voucher: m.voucher || '' }
   });
   const id = reservation.data?.id || reservation.id;
   if (!id) throw new Error('Hospitable returned no reservation id');
@@ -237,7 +254,7 @@ app.post('/api/reservations', async (req, res) => {
     const q = getQuote(quoteId);
     if (!q) return res.status(410).json({ error: 'Quote expired' });
     const guest = cleanGuest(req.body.guest);
-    if (!guest) return res.status(400).json({ error: 'Guest name, email and phone are required' });
+    if (!guest) return res.status(400).json({ error: 'Guest first name, last name, email and phone are required' });
     if (!(q.total <= 0 && q.voucher && q.voucher.pct === 100))
       return res.status(402).json({ error: 'Payment is required for this booking' });
     // Server re-checks the signature so a tampered stored quote cannot slip through.
@@ -247,7 +264,8 @@ app.post('/api/reservations', async (req, res) => {
     const freeRes = await createReservation({
       propertyId: PROPERTY_ID, guest,
       checkIn: q.checkIn, checkOut: q.checkOut, guests: q.guests,
-      addons: q.addons, paymentIntentId: null, totals: q
+      addons: q.addons, paymentIntentId: null, currency: CURRENCY,
+      totals: { total: 0, voucher: q.voucher.code }
     });
     const id = freeRes.data?.id || freeRes.id;
     await adminAlert(`Comp booking via voucher ${q.voucher.code}: ${guest.firstName} ${guest.lastName}, ${q.checkIn} → ${q.checkOut}`);
@@ -289,11 +307,15 @@ async function handleStripeWebhook(req, res) {
       const piId = typeof d.payment_intent === 'string' ? d.payment_intent : d.payment_intent?.id;
       let resId = null;
       if (piId) {
-        try { resId = (await stripe.paymentIntents.retrieve(piId)).metadata?.reservation_id || null; }
+        // Goes through fulfilment so a dispute that lands while the booking is still
+        // being created waits for it and gets the right reservation id.
+        try { resId = (await fulfilPaymentIntent(piId)).reservationId || null; }
         catch (e) { console.error(e); }
       }
       await adminAlert(`⚠ Stripe DISPUTE ${d.id} on charge ${d.charge} (£${(d.amount / 100).toFixed(2)}, reason: ${d.reason || 'n/a'}) — reservation ${resId || 'unknown'}.`);
-      if (resId) await flagReservation(resId, { flags: { disputed: true } }).catch(console.error);
+      if (resId) await setReservationNote(resId,
+        `⚠ PAYMENT DISPUTED — Stripe dispute ${d.id} (reason: ${d.reason || 'n/a'}) on payment ${piId}. Direct booking via porticosuites.com.`
+      ).catch(console.error);
       break;
     }
   }
