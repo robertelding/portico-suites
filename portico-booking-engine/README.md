@@ -21,6 +21,12 @@ Design decisions:
   15-minute quotes — a tampered client can never change what gets charged.
 - Payment is verified against Stripe **before** the reservation is created;
   if reservation creation fails after a successful charge, an admin alert fires.
+- The booking details travel in the PaymentIntent's metadata, and the
+  `payment_intent.succeeded` webhook creates the reservation if the guest's
+  browser never calls back (closed tab, expired quote, server restart). The
+  reservation id is written back to the PaymentIntent, so it is created once
+  only. **The Stripe webhook must be registered for this safety net to work.**
+- Availability is re-checked immediately before each payment is started.
 - All webhook listeners validate cryptographic signatures (Stripe official SDK
   verification; Hospitable HMAC with timing-safe comparison).
 

@@ -161,9 +161,9 @@
     const btn = document.getElementById('bw-go');
     if (free) return reserve(null, btn);
     if (stage !== 'pay') {
-      if (!guest()) return;
+      const g0 = guest(); if (!g0) return;
       btn.disabled = true; btn.textContent = 'Preparing secure payment…';
-      const r = await fetch(`${API}/api/payments/intent`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ quoteId: quote.quoteId }) });
+      const r = await fetch(`${API}/api/payments/intent`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ quoteId: quote.quoteId, guest: g0 }) });
       const j = await r.json();
       if (j.free) return reserve(null, btn);
       if (!r.ok || !j.clientSecret) { btn.disabled = false; btn.textContent = 'Continue to Secure Payment'; return msg(j.error || 'Could not start payment.'); }
@@ -177,8 +177,11 @@
     const g = guest(); if (!g) return;
     btn.disabled = true; btn.textContent = 'Processing…';
     const { error, paymentIntent } = await stripe.confirmPayment({ elements, redirect: 'if_required',
-      confirmParams: { payment_method_data: { billing_details: { name: `${g.firstName} ${g.lastName}`, email: g.email, phone: g.phone } } } });
+      confirmParams: { return_url: `${location.origin}/booking-confirmation/`,
+        payment_method_data: { billing_details: { name: `${g.firstName} ${g.lastName}`, email: g.email, phone: g.phone } } } });
     if (error) { msg(error.message); btn.disabled = false; btn.textContent = 'Confirm & Pay Securely'; return; }
+    // Payment still clearing (e.g. bank debit): the server completes the booking when Stripe confirms it.
+    if (paymentIntent.status !== 'succeeded') { location.href = '/booking-confirmation/'; return; }
     reserve(paymentIntent.id, btn, g);
   }
 

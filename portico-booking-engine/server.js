@@ -13,6 +13,7 @@ const express = require('express');
 const crypto = require('crypto');
 const Stripe = require('stripe');
 const { getProperty, getCalendar, createReservation, flagReservation } = require('./lib/hospitable');
+const { verifyVoucher } = require('./lib/vouchers');
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const app = express();
@@ -130,57 +131,135 @@ app.post('/api/quote', async (req, res) => {
   } catch (e) { res.status(502).json({ error: 'Could not price those dates' }); console.error(e); }
 });
 
-/* ── 4. Payment intent (3D Secure via Stripe Elements client-side) ──── */
+/* ── 4. Payment intent (3D Secure via Stripe Elements client-side) ────
+   Everything needed to create the reservation is written into the
+   PaymentIntent's metadata, so the booking can be completed from the Stripe
+   webhook even if the guest's browser never calls back, the 15-minute quote
+   has expired, or this server restarted in between. */
+const BOOKING_SOURCE = 'portico-direct';
+const clip = (v, n) => String(v || '').trim().slice(0, n);
+function cleanGuest(g) {
+  const guest = { firstName: clip(g?.firstName, 100), lastName: clip(g?.lastName, 100),
+                  email: clip(g?.email, 200), phone: clip(g?.phone, 40) };
+  return guest.firstName && guest.email && guest.phone ? guest : null;
+}
+
 app.post('/api/payments/intent', async (req, res) => {
   try {
-    const q = getQuote(req.body.quoteId);
+    const { quoteId } = req.body;
+    const q = getQuote(quoteId);
     if (!q) return res.status(410).json({ error: 'Quote expired — please reprice' });
     if (q.total <= 0) return res.json({ free: true });   // 100% voucher — no payment needed
+    const guest = cleanGuest(req.body.guest);
+    if (!guest) return res.status(400).json({ error: 'Guest name, email and phone are required' });
+
+    // Re-check live availability immediately before taking payment.
+    const days = await getCalendar(PROPERTY_ID, q.checkIn, q.checkOut);
+    const nights = days.filter(d => d.date >= q.checkIn && d.date < q.checkOut);
+    if (nights.length !== q.nights || nights.some(d => !d.available))
+      return res.status(409).json({ error: 'Those dates have just been booked — please choose different dates' });
+
+    // Same quote + same guest details → same Customer and PaymentIntent (no duplicates on double-click).
+    const idem = crypto.createHash('sha256').update(`${quoteId}|${JSON.stringify(guest)}`).digest('hex');
+    const customer = await stripe.customers.create({
+      name: `${guest.firstName} ${guest.lastName}`.trim(), email: guest.email, phone: guest.phone,
+      metadata: { source: BOOKING_SOURCE }
+    }, { idempotencyKey: `cus-${idem}` });
     const intent = await stripe.paymentIntents.create({
       amount: Math.round(q.total * 100),
       currency: CURRENCY,
+      customer: customer.id,                       // required for the saved card to be reusable
       automatic_payment_methods: { enabled: true },
       setup_future_usage: 'off_session',           // tokenize for post-stay incidental holds
-      metadata: { quoteId: req.body.quoteId, checkIn: q.checkIn, checkOut: q.checkOut }
-    });
+      receipt_email: guest.email,
+      description: `Portico Suites stay ${q.checkIn} → ${q.checkOut}`,
+      metadata: {
+        source: BOOKING_SOURCE, quoteId,
+        checkIn: q.checkIn, checkOut: q.checkOut, guests: String(q.guests),
+        addons: (q.addons || []).join(','), total: String(q.total),
+        voucher: q.voucher ? q.voucher.code : '',
+        guestFirstName: guest.firstName, guestLastName: guest.lastName,
+        guestEmail: guest.email, guestPhone: guest.phone
+      }
+    }, { idempotencyKey: `pi-${idem}` });
     res.json({ clientSecret: intent.client_secret });
   } catch (e) { res.status(502).json({ error: 'Payment initialisation failed' }); console.error(e); }
 });
 
-/* ── 5. Reservation creation after successful payment ───────────────── */
-app.post('/api/reservations', async (req, res) => {
+/* ── Fulfilment: paid PaymentIntent → Hospitable reservation (exactly once) ──
+   Called by both the Stripe webhook and the browser's /api/reservations call;
+   whichever arrives first creates the reservation, the other gets the same id.
+   The reservation id is written back to the PaymentIntent, so repeats after a
+   restart are also no-ops. */
+const fulfilling = new Map();
+function fulfilPaymentIntent(intentId) {
+  if (!fulfilling.has(intentId))
+    fulfilling.set(intentId, doFulfil(intentId).finally(() => fulfilling.delete(intentId)));
+  return fulfilling.get(intentId);
+}
+async function doFulfil(intentId) {
+  const intent = await stripe.paymentIntents.retrieve(intentId);
+  const m = intent.metadata || {};
+  if (m.source !== BOOKING_SOURCE) return { skipped: true };        // not a booking payment
+  if (intent.status !== 'succeeded') return { unpaid: true };
+  if (m.reservation_id) return { reservationId: m.reservation_id };
+
+  const reservation = await createReservation({
+    propertyId: PROPERTY_ID,
+    guest: { firstName: m.guestFirstName, lastName: m.guestLastName, email: m.guestEmail, phone: m.guestPhone },
+    checkIn: m.checkIn, checkOut: m.checkOut, guests: Number(m.guests) || 1,
+    addons: m.addons ? m.addons.split(',') : [],
+    paymentIntentId: intentId, totals: { total: Number(m.total) }
+  });
+  const id = reservation.data?.id || reservation.id;
+  if (!id) throw new Error('Hospitable returned no reservation id');
   try {
-    const { quoteId, paymentIntentId, guest } = req.body;
+    await stripe.paymentIntents.update(intentId, { metadata: { reservation_id: String(id) } });
+  } catch (e) {
+    await adminAlert(`Reservation ${id} created but could not be recorded on payment ${intentId} — check for a duplicate reservation.`);
+  }
+  if (m.quoteId) quotes.delete(m.quoteId);
+  return { reservationId: String(id), created: true };
+}
+
+/* ── 5. Reservation confirmation (browser calls this after paying) ──── */
+app.post('/api/reservations', async (req, res) => {
+  const { quoteId, paymentIntentId } = req.body;
+  try {
+    if (paymentIntentId) {
+      const r = await fulfilPaymentIntent(String(paymentIntentId));
+      if (!r.reservationId) return res.status(402).json({ error: 'Payment not verified' });
+      return res.json({ reservationId: r.reservationId,
+                        redirect: `/booking-confirmation/?reservation_id=${encodeURIComponent(r.reservationId)}` });
+    }
+
+    // No payment: only a signed 100% voucher may book.
     const q = getQuote(quoteId);
     if (!q) return res.status(410).json({ error: 'Quote expired' });
-    if (!guest?.email || !guest?.phone || !guest?.firstName)
-      return res.status(400).json({ error: 'Guest name, email and phone are required' });
-
-    if (q.total <= 0 && q.voucher && q.voucher.pct === 100) {
-      // Fully-comped stay via signed 100% voucher — no payment to verify.
-      // Server re-checks the signature so a tampered stored quote cannot slip through.
-      if (!verifyVoucher(q.voucher.code, process.env.VOUCHER_SECRET))
-        return res.status(402).json({ error: 'Voucher could not be re-verified' });
-      const freeRes = await createReservation({ quote: q, guest, paymentIntentId: null });
-      await adminAlert(`Comp booking via voucher ${q.voucher.code}: ${guest.firstName} ${guest.lastName || ''}, ${q.checkIn} → ${q.checkOut}`);
-      return res.json({ reservationId: freeRes.id, comp: true });
-    }
-    const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
-    if (intent.status !== 'succeeded' || intent.metadata.quoteId !== quoteId)
-      return res.status(402).json({ error: 'Payment not verified' });
-
-    const reservation = await createReservation({
+    const guest = cleanGuest(req.body.guest);
+    if (!guest) return res.status(400).json({ error: 'Guest name, email and phone are required' });
+    if (!(q.total <= 0 && q.voucher && q.voucher.pct === 100))
+      return res.status(402).json({ error: 'Payment is required for this booking' });
+    // Server re-checks the signature so a tampered stored quote cannot slip through.
+    if (!verifyVoucher(q.voucher.code, process.env.VOUCHER_SECRET))
+      return res.status(402).json({ error: 'Voucher could not be re-verified' });
+    quotes.delete(quoteId);                       // one booking per quote
+    const freeRes = await createReservation({
       propertyId: PROPERTY_ID, guest,
       checkIn: q.checkIn, checkOut: q.checkOut, guests: q.guests,
-      addons: q.addons, paymentIntentId, totals: q
+      addons: q.addons, paymentIntentId: null, totals: q
     });
-    const id = reservation.data?.id || reservation.id;
-    quotes.delete(quoteId);
-    res.json({ reservationId: id, redirect: `/booking-confirmation?reservation_id=${id}` });
+    const id = freeRes.data?.id || freeRes.id;
+    await adminAlert(`Comp booking via voucher ${q.voucher.code}: ${guest.firstName} ${guest.lastName}, ${q.checkIn} → ${q.checkOut}`);
+    res.json({ reservationId: id, comp: true });
   } catch (e) {
-    await adminAlert(`Reservation creation FAILED after successful payment ${req.body.paymentIntentId} — manual action needed.`);
-    res.status(502).json({ error: 'Booking record failed — payment taken; our team has been alerted and will confirm shortly.' });
     console.error(e);
+    if (paymentIntentId) {
+      await adminAlert(`Reservation creation FAILED after successful payment ${paymentIntentId} — manual action needed.`);
+      return res.status(502).json({ error: 'Booking record failed — payment taken; our team has been alerted and will confirm shortly.' });
+    }
+    await adminAlert(`Comp (voucher) reservation creation FAILED for quote ${quoteId}: ${e.message}`);
+    res.status(502).json({ error: 'Could not complete the booking — please contact us.' });
   }
 });
 
@@ -193,13 +272,27 @@ async function handleStripeWebhook(req, res) {
   } catch (e) { return res.status(400).send(`Signature verification failed`); }
 
   switch (event.type) {
-    case 'payment_intent.succeeded':
-      console.log('✓ payment_intent.succeeded', event.data.object.id);
+    case 'payment_intent.succeeded': {
+      const piId = event.data.object.id;
+      try {
+        const r = await fulfilPaymentIntent(piId);
+        console.log('✓ payment_intent.succeeded', piId, r.skipped ? '(not a booking payment)' : `→ reservation ${r.reservationId}`);
+      } catch (e) {
+        console.error(e);
+        await adminAlert(`Reservation creation FAILED after successful payment ${piId} — Stripe will retry; manual action may be needed.`);
+        return res.status(500).json({ error: 'Fulfilment failed' });   // non-2xx → Stripe retries
+      }
       break;
+    }
     case 'charge.dispute.created': {
-      const ch = event.data.object;
-      await adminAlert(`⚠ Stripe DISPUTE on charge ${ch.id} (£${(ch.amount / 100).toFixed(2)}).`);
-      const resId = ch.metadata?.reservation_id;
+      const d = event.data.object;                 // a Dispute, not a Charge
+      const piId = typeof d.payment_intent === 'string' ? d.payment_intent : d.payment_intent?.id;
+      let resId = null;
+      if (piId) {
+        try { resId = (await stripe.paymentIntents.retrieve(piId)).metadata?.reservation_id || null; }
+        catch (e) { console.error(e); }
+      }
+      await adminAlert(`⚠ Stripe DISPUTE ${d.id} on charge ${d.charge} (£${(d.amount / 100).toFixed(2)}, reason: ${d.reason || 'n/a'}) — reservation ${resId || 'unknown'}.`);
       if (resId) await flagReservation(resId, { flags: { disputed: true } }).catch(console.error);
       break;
     }
@@ -241,7 +334,6 @@ app.post('/webhooks/minut', async (req, res) => {
 });
 
 /* ── Meta Ads: campaign creation from the CMS (admin-key protected) ──── */
-const { verifyVoucher } = require('./lib/vouchers');
 const { createFullCampaign } = require('./lib/meta-ads');            // raw Graph API (fallback)
 const { createFullCampaignCLI, cliAvailable } = require('./lib/meta-ads-cli'); // official Meta Ads CLI (preferred)
 app.post('/api/meta/campaign', async (req, res) => {
