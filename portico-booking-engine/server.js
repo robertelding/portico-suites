@@ -101,7 +101,7 @@ app.get('/api/calendar', async (req, res) => {
 const ADDONS = { parking: { label: 'Private parking', amount: 0 },
                  early_checkin: { label: 'Early check-in (1:00 PM)', amount: 25 } };
 const MAX_GUESTS = 10;
-const CLEANING_FEE = 60;      // move to env/Hospitable fees once confirmed
+const CLEANING_FEE = 150;     // move to env/Hospitable fees once confirmed
 const TAX_PCT = 0;            // UK: set if registered / local taxes apply
 
 app.post('/api/quote', async (req, res) => {
