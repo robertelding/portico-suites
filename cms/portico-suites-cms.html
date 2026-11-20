@@ -268,10 +268,10 @@ const DEFAULT_CONTENT = {
   },
   booking:{
     eyebrow:'Reserve Direct', heading:'Secure Your Stay',
-    intro:'Payments handled securely by Stripe or PayPal, with instant confirmation to your inbox.',
+    intro:'Payments handled securely by Stripe, with instant confirmation to your inbox.',
     currency:'£', nightlyRate:0, cleaningFee:0,
-    apiBase:'https://booking.porticosuites.com', stripePk:'',
-    hospitableSiteUuid:'a2c4edd4-3b79-4270-a2e5-b2cd1475eea4',
+    apiBase:'https://booking.porticosuites.com', stripePk:'pk_live_51UdS0r3U6zUsw3iuRlKpUCeV1nAbMkUW7da3Ia3HMhizYaMpk9EAm33l2CLzRFxfAA4KAzHEhzJfMsvNcjqwAyU200ahlaABJA',
+    hospitableSiteUuid:'',
     hospitablePropertyId:'2466600', hospitableTheme:'multi',
     secureNote:'256-bit SSL · Powered by Stripe · Instant confirmation · No account required'
   },
@@ -292,7 +292,7 @@ const DEFAULT_CONTENT = {
     tabs:[
       {title:'Cancellation', items:['Free cancellation up to 30 days before arrival — full refund.','Cancel 14–30 days before arrival — 50% refund (cleaning fee fully refunded).','Within 14 days of arrival — non-refundable.']},
       {title:'Terms of Service', items:['Arrival from 4:00 PM · Departure by 10:00 AM.','Maximum occupancy as booked; no parties or events.','No smoking inside the property.','Guests are responsible for damage beyond normal wear and tear.']},
-      {title:'Privacy Policy', items:['Booking details are collected solely to process your reservation.','Payments are processed by Stripe/PayPal — card details are never stored on this site.','We do not sell or share guest data with third parties.']}
+      {title:'Privacy Policy', items:['Booking details are collected solely to process your reservation.','Payments are processed by Stripe — card details are never stored on this site.','We do not sell or share guest data with third parties.']}
     ]
   },
   footer:{
@@ -364,7 +364,7 @@ const DEFAULT_CONTENT = {
         {q:'Where can a group of 10 stay in Harrogate?', a:'Portico Suites sleeps up to 10 guests across 7 bedrooms with 5 bathrooms, making it one of the largest holiday homes in central Harrogate for families and groups.'},
       {q:'How many guests can stay?', a:'The house sleeps up to 10 guests across 7 bedrooms set over three floors, with 5 bathrooms — 4 of them en-suite.'},
       {q:'How do I get the best rate?', a:'Book direct on this website — direct bookings carry no platform fees and beat Airbnb and Vrbo pricing for the same dates.'},
-      {q:'Is booking instant?', a:'Yes. Payment is processed securely by Stripe or PayPal and confirmation is emailed instantly.'}
+      {q:'Is booking instant?', a:'Yes. Payment is processed securely by Stripe and confirmation is emailed instantly.'}
     ],
     tasks:{}, lastUpdated:''
   },
@@ -397,7 +397,7 @@ const DEFAULT_CONTENT = {
       ]},
       {name:'Booking & Payment', items:[
         {q:'How do I get the best rate?', a:'Book direct on this website — direct bookings carry no platform fees and beat Airbnb and Vrbo pricing for the same dates.'},
-        {q:'Is booking instant?', a:'Yes. Payment is processed securely by Stripe or PayPal and confirmation is emailed instantly.'},
+        {q:'Is booking instant?', a:'Yes. Payment is processed securely by Stripe and confirmation is emailed instantly.'},
         {q:'Is there a deposit?', a:'A pre-arrival guest verification and a refundable security deposit hold are completed 72 hours before check-in.'}
       ]},
       {name:'The Local Area', items:[
